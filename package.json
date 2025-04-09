@@ -1,0 +1,18 @@
+{
+  "name": "ovenmdk-runtime",
+  "version": "0.0.1",
+  "description": "Dev kit used for simplifying EaglerForge mod development.",
+  "scripts": {
+    "build": "webpack --config webpack.config.js",
+    "build-bun": "bun build --bundle ./src/main.ts --outdir=build/ --outfile=build/NAME.js --sourcemap=inline --watch --target browser --entry-naming EaglerForge-[hash].js",
+    "build-es": "esbuild --bundle ./src/main.ts --outfile=build/NAME.js --sourcemap=inline --watch=forever"
+  },
+  "author": "Block_2222",
+  "devDependencies": {
+    "css-loader": "^6.8.1",
+    "ts-loader": "^9.4.4",
+    "typescript": "^5.2.2",
+    "webpack": "^5.88.2",
+    "webpack-cli": "^5.1.4"
+  }
+}
