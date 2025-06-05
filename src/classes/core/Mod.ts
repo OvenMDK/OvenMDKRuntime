@@ -30,17 +30,19 @@ export default class OMod {
     static icon:string = defaultIcon;
 
     static acceptedMinecraftVersions:Array<string> = null;
-	static acceptedEaglerUpdates:Array<string> = null;
-	static acceptedEFVersions:Array<string> = null;
-	static acceptedEFFlavour:string = "injector";
+    static acceptedEaglerUpdates:Array<string> = null;
+    static acceptedEFVersions:Array<string> = null;
+    static acceptedEFFlavour:string = "injector";
 
     static clientSideOnly:boolean = false;
     static serverSideOnly:boolean = false;
     
+    static config():void {
+
+    }
     static init():void {
 
     }
-
     static postInit():void {
 
     }
