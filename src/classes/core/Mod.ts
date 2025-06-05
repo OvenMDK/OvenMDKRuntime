@@ -28,7 +28,7 @@ export default class OMod {
     static description:string = "Default OvenMDK Description. Set 'description' in your OMod class!";
     static credits:string = "None Given";
     static icon:string = defaultIcon;
-
+	
     static acceptedMinecraftVersions:Array<string> = null;
     static acceptedEaglerUpdates:Array<string> = null;
     static acceptedEFVersions:Array<string> = null;
