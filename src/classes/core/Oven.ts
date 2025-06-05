@@ -29,10 +29,10 @@ export default class Oven {
     static registerMod(modClass: any) {
         ModAPI.meta.title(modClass.title);
         ModAPI.meta.version(modClass.version);
-		ModAPI.meta.description(modClass.description);
-		ModAPI.meta.credits(modClass.credits);
-		ModAPI.meta.icon(modClass.icon);
-
+	ModAPI.meta.description(modClass.description);
+	ModAPI.meta.credits(modClass.credits);
+	ModAPI.meta.icon(modClass.icon);
+	ModAPI.meta.config(modClass.config())
         modClass.init();
 
         this.mods.push(modClass);
