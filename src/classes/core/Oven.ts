@@ -32,7 +32,7 @@ export default class Oven {
 	ModAPI.meta.description(modClass.description);
 	ModAPI.meta.credits(modClass.credits);
 	ModAPI.meta.icon(modClass.icon);
-	ModAPI.meta.config(modClass.config())
+	ModAPI.meta.config(modClass.config());
         modClass.init();
 
         this.mods.push(modClass);
