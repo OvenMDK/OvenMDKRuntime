@@ -36,7 +36,7 @@ export default class OMod {
 
     static clientSideOnly:boolean = false;
     static serverSideOnly:boolean = false;
-    
+    static only_1_12_2:boolen = false;
     static config():void {
 
     }
