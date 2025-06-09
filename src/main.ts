@@ -29,9 +29,9 @@ ModAPI.meta.version("INDEV");
 ModAPI.meta.description("Unofficial dev kit used for simplifying EaglerForge mod development.");
 ModAPI.meta.credits("Block_2222");
 ModAPI.meta.icon(icon);
-
+import OItem from "classes/core/Oven";
 import OMod from "classes/core/Mod";
 import Oven from "classes/core/Oven";
-
+globalThis.OItem = OItem;
 globalThis.OMod = OMod;
 globalThis.OvenMDK = Oven;

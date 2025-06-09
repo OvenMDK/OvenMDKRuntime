@@ -21,7 +21,6 @@
     with Oven MDK. If not, see <https://www.gnu.org/licenses/>.
 */
 import defaultIcon from "ASSETS/defaultIcon.png"
-
 export default class OMod {
     static title:string = "Default Name";
     static version:string = "";
@@ -36,7 +35,7 @@ export default class OMod {
 
     static clientSideOnly:boolean = false;
     static serverSideOnly:boolean = false;
-    static only_1_12_2:boolen = false;
+    static only_1_12_2:boolean = false;
     static config():void {
 
     }
