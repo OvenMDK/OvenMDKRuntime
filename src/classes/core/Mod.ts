@@ -20,29 +20,25 @@
     You should have received a copy of the GNU Lesser General Public License along 
     with Oven MDK. If not, see <https://www.gnu.org/licenses/>.
 */
-import defaultIcon from "ASSETS/defaultIcon.png"
+import defaultIcon from "ASSETS/defaultIcon.png";
+
 export default class OMod {
-    static title:string = "Default Name";
-    static version:string = "";
-    static description:string = "Default OvenMDK Description. Set 'description' in your OMod class!";
-    static credits:string = "None Given";
-    static icon:string = defaultIcon;
-	
-    static acceptedMinecraftVersions:Array<string> = null;
-    static acceptedEaglerUpdates:Array<string> = null;
-    static acceptedEFVersions:Array<string> = null;
-    static acceptedEFFlavour:string = "injector";
+  static title: string = "Default Name";
+  static version: string = "";
+  static description: string =
+    "Default OvenMDK Description. Set 'description' in your OMod class!";
+  static credits: string = "None Given";
+  static icon: string = defaultIcon;
 
-    static clientSideOnly:boolean = false;
-    static serverSideOnly:boolean = false;
-    static only_1_12_2:boolean = false;
-    static config():void {
+  static acceptedMinecraftVersions: Array<string> = null;
+  static acceptedEaglerUpdates: Array<string> = null;
+  static acceptedEFVersions: Array<string> = null;
+  static acceptedEFFlavour: string = "injector";
 
-    }
-    static init():void {
-
-    }
-    static postInit():void {
-
-    }
+  static clientSideOnly: boolean = false;
+  static serverSideOnly: boolean = false;
+  static only_1_12_2: boolean = false;
+  static config(): void {}
+  static init(): void {}
+  static postInit(): void {}
 }
