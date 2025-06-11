@@ -23,48 +23,47 @@
 
 import OMod from "./Mod";
 
-type OItemConfig = {
-  itemId: string;
+interface ExampleItemConfig {
+  itemName?: string;
+  itemTexture?: string;
+}
+
+export class OItem {
+  creativeMiscTab: any;
+  itemClass: any;
+  itemSuper: any;
+  exampleItemInstance: any;
   itemName: string;
-  texture: string;
-};
+  itemTexture?: string;
 
-class OItem {
-  private itemId: string;
-  private itemName: string;
-  private texture: string;
-  private exampleItemInstance: any;
+  constructor(config: ExampleItemConfig = {}) {
+    this.itemName = config.itemName || "exampleitem";
+    this.itemTexture = config.itemTexture;
 
-  constructor(config: OItemConfig) {
-    this.itemId = config.itemId;
-    this.itemName = config.itemName;
-    this.texture = config.texture;
-
-    ModAPI.dedicatedServer.appendCode(this.ExampleItem.bind(this));
-
-    this.exampleItemInstance = this.ExampleItem();
-
-    this.setupAsyncSink();
-  }
-
-  private ExampleItem() {
-    const creativeMiscTab = ModAPI.reflect.getClassById(
+    this.creativeMiscTab = ModAPI.reflect.getClassById(
       "net.minecraft.creativetab.CreativeTabs"
     ).staticVariables.tabMisc;
-    const itemClass = ModAPI.reflect.getClassById("net.minecraft.item.Item");
-    const itemSuper = ModAPI.reflect.getSuper(
-      itemClass,
-      (x: any) => x.length === 1
+    this.itemClass = ModAPI.reflect.getClassById("net.minecraft.item.Item");
+    this.itemSuper = ModAPI.reflect.getSuper(
+      this.itemClass,
+      (x: any[]) => x.length === 1
     );
 
-    // Define the custom item class
+    this.defineItemClass();
+    this.registerItem();
+  }
+
+  private defineItemClass() {
+    const creativeMiscTab = this.creativeMiscTab;
+    const itemSuper = this.itemSuper;
+    console.log("adding item...");
     function nmi_ItemExample(this: any) {
-      itemSuper(this); // call super constructor
+      itemSuper(this);
       this.$setCreativeTab(creativeMiscTab);
     }
-    ModAPI.reflect.prototypeStack(itemClass, nmi_ItemExample);
 
-    // Override right-click behavior
+    ModAPI.reflect.prototypeStack(this.itemClass, nmi_ItemExample);
+
     nmi_ItemExample.prototype.$onItemRightClick = function (
       $itemstack: any,
       $world: any,
@@ -73,50 +72,60 @@ class OItem {
       return $itemstack;
     };
 
-    // Internal registration function
-    const internal_reg = () => {
-      const example_item = new (nmi_ItemExample as any)().$setUnlocalizedName(
-        ModAPI.util.str(this.itemId)
-      );
-      itemClass.staticMethods.registerItem.method(
-        ModAPI.keygen.item(this.itemId),
-        ModAPI.util.str(this.itemId),
-        example_item
-      );
-      ModAPI.items[this.itemId] = example_item;
-      return example_item;
-    };
+    this.nmi_ItemExample = nmi_ItemExample as any;
+  }
 
+  private nmi_ItemExample: any;
+
+  private internal_reg() {
+    this.exampleItemInstance = new this.nmi_ItemExample();
+    this.exampleItemInstance.$setUnlocalizedName(
+      ModAPI.util.str(this.itemName)
+    );
+
+    this.itemClass.staticMethods.registerItem.method(
+      ModAPI.keygen.item(this.itemName),
+      ModAPI.util.str(this.itemName),
+      this.exampleItemInstance
+    );
+
+    ModAPI.items[this.itemName] = this.exampleItemInstance;
+  }
+
+  private registerItem() {
     if (ModAPI.items) {
-      return internal_reg();
+      this.internal_reg();
     } else {
-      ModAPI.addEventListener("bootstrap", internal_reg);
-      return null;
+      ModAPI.addEventListener("bootstrap", () => this.internal_reg());
     }
   }
 
-  private setupAsyncSink() {
+  getItemInstance() {
+    return this.exampleItemInstance;
+  }
+
+  async setupAsyncSink() {
+    if (!this.exampleItemInstance) return;
+
     ModAPI.addEventListener("lib:asyncsink", async () => {
       ModAPI.addEventListener(
         "lib:asyncsink:registeritems",
         (renderItem: any) => {
-          if (this.exampleItemInstance) {
-            renderItem.registerItem(
-              this.exampleItemInstance,
-              ModAPI.util.str(this.itemId)
-            );
-          }
+          renderItem.registerItem(
+            this.exampleItemInstance,
+            ModAPI.util.str(this.itemName)
+          );
         }
       );
 
-      AsyncSink.L10N.set(`item.${this.itemId}.name`, this.itemName);
+      AsyncSink.L10N.set(`item.${this.itemName}.name`, "Example Item");
 
       AsyncSink.setFile(
-        `resourcepacks/AsyncSinkLib/assets/minecraft/models/item/${this.itemId}.json`,
+        `resourcepacks/AsyncSinkLib/assets/minecraft/models/item/${this.itemName}.json`,
         JSON.stringify({
           parent: "builtin/generated",
           textures: {
-            layer0: `items/${this.itemId}`,
+            layer0: `items/${this.itemName}`,
           },
           display: {
             thirdperson: {
@@ -133,10 +142,12 @@ class OItem {
         })
       );
 
-      AsyncSink.setFile(
-        `resourcepacks/AsyncSinkLib/assets/minecraft/textures/items/${this.itemId}.png`,
-        await (await fetch(this.texture)).arrayBuffer()
-      );
+      if (this.itemTexture) {
+        AsyncSink.setFile(
+          `resourcepacks/AsyncSinkLib/assets/minecraft/textures/items/${this.itemName}.png`,
+          await (await fetch(this.itemTexture)).arrayBuffer()
+        );
+      }
     });
   }
 }
