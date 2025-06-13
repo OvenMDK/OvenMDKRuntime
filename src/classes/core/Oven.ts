@@ -28,11 +28,13 @@ export class OItem {
   private itemName: string;
   private itemID: string;
   private itemInstance: any;
+  private onRightClick(): void {}
 
-  constructor(itemName: string, itemID: string, texture: string) {
+  constructor(itemName: string, itemID: string, texture: string, onRightClick) {
     this.itemName = itemName;
     this.itemID = itemID;
     this.itemTexture = texture;
+    this.onRightClick() = onRightClick();
   }
 
   public register(): void {
