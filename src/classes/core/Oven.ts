@@ -24,15 +24,22 @@
 import OMod from "./Mod";
 
 export class OItem {
-  private static readonly itemTexture: string =
-    "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAKZJREFUOE9j/P//PxMDBIBoEP6HREOl4PLIciA2AyPIgMcM//7KgvWSDJjBBpx9/+YvJzc3Sbq12DhB6sEGsJ19/+YnmQawYhigzc7FcPXnN4KugbqAHWQAy9n3b34T4wJkw6EGYLqAoNVQBWS5ANlwZBfAvUCs/0EGkW0AzBKqGoCSDgh5A80F2KMRpAgfAKUT6kcjsfEPUycmKMQgy8AETkgUZWcAS3CPIf4oSPsAAAAASUVORK5CYII=";
+  private itemTexture: string;
+  private itemName: string;
+  private itemID: string;
+  private itemInstance: any;
 
-  private static exampleItem: any;
+  constructor(itemName: string, itemID: string, texture: string) {
+    this.itemName = itemName;
+    this.itemID = itemID;
+    this.itemTexture = texture;
+  }
 
-  public static register(): void {
+  public register(): void {
     const creativeMiscTab: any = ModAPI.reflect.getClassById(
       "net.minecraft.creativetab.CreativeTabs"
     ).staticVariables.tabMisc;
+
     const itemClass: any = ModAPI.reflect.getClassById(
       "net.minecraft.item.Item"
     );
@@ -41,37 +48,40 @@ export class OItem {
       (x: any[]) => x.length === 1
     );
 
-    function nmi_ItemExample(this: any): void {
+    const self = this;
+
+    function nmi_OvenItem(this: any): void {
       itemSuper(this);
       this.$setCreativeTab(creativeMiscTab);
     }
 
-    ModAPI.reflect.prototypeStack(itemClass, nmi_ItemExample);
+    ModAPI.reflect.prototypeStack(itemClass, nmi_OvenItem);
 
-    nmi_ItemExample.prototype.$onItemRightClick = function (
+    nmi_OvenItem.prototype.$onItemRightClick = function (
       $itemstack: any,
       $world: any,
       $player: any
     ): any {
+      // You can customize item behavior here
       return $itemstack;
     };
 
-    function internal_reg(): any {
-      const itemInstance: any = new nmi_ItemExample().$setUnlocalizedName(
-        ModAPI.util.str("exampleitem")
+    const internal_reg = (): any => {
+      const itemInstance: any = new nmi_OvenItem().$setUnlocalizedName(
+        ModAPI.util.str(self.itemID)
       );
 
       itemClass.staticMethods.registerItem.method(
-        ModAPI.keygen.item("exampleitem"),
-        ModAPI.util.str("exampleitem"),
+        ModAPI.keygen.item(self.itemID),
+        ModAPI.util.str(self.itemID),
         itemInstance
       );
 
-      ModAPI.items["exampleitem"] = itemInstance;
-      OItem.exampleItem = itemInstance;
+      ModAPI.items[self.itemID] = itemInstance;
+      self.itemInstance = itemInstance;
 
       return itemInstance;
-    }
+    };
 
     if (ModAPI.items) {
       internal_reg();
@@ -79,29 +89,31 @@ export class OItem {
       ModAPI.addEventListener("bootstrap", internal_reg);
     }
 
-    ModAPI.dedicatedServer.appendCode(() => OItem.register());
+    ModAPI.dedicatedServer.appendCode(() => this.register());
   }
 
-  public static async registerClient(): Promise<void> {
+  public async registerClient(): Promise<void> {
+    const self = this;
+
     ModAPI.addEventListener("lib:asyncsink", async () => {
       ModAPI.addEventListener(
         "lib:asyncsink:registeritems",
         (renderItem: any) => {
           renderItem.registerItem(
-            OItem.exampleItem,
-            ModAPI.util.str("exampleitem")
+            self.itemInstance,
+            ModAPI.util.str(self.itemID)
           );
         }
       );
 
-      AsyncSink.L10N.set("item.exampleitem.name", "Example Item");
+      AsyncSink.L10N.set(`item.${self.itemID}.name`, self.itemName);
 
       AsyncSink.setFile(
-        "resourcepacks/AsyncSinkLib/assets/minecraft/models/item/exampleitem.json",
+        `resourcepacks/AsyncSinkLib/assets/minecraft/models/item/${self.itemID}.json`,
         JSON.stringify({
           parent: "builtin/generated",
           textures: {
-            layer0: "items/exampleitem",
+            layer0: `items/${self.itemID}`,
           },
           display: {
             thirdperson: {
@@ -118,11 +130,11 @@ export class OItem {
         })
       );
 
-      const response = await fetch(OItem.itemTexture);
+      const response = await fetch(self.itemTexture);
       const buffer = await response.arrayBuffer();
 
       AsyncSink.setFile(
-        "resourcepacks/AsyncSinkLib/assets/minecraft/textures/items/exampleitem.png",
+        `resourcepacks/AsyncSinkLib/assets/minecraft/textures/items/${self.itemID}.png`,
         buffer
       );
     });
