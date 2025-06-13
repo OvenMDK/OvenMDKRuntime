@@ -28,13 +28,13 @@ export class OItem {
   private itemName: string;
   private itemID: string;
   private itemInstance: any;
-  private onRightClick(): void {}
+  //private onRightClick(): void {}
 
-  constructor(itemName: string, itemID: string, texture: string, onRightClick) {
+  constructor(itemName: string, itemID: string, texture: string) {
     this.itemName = itemName;
     this.itemID = itemID;
     this.itemTexture = texture;
-    this.onRightClick() = onRightClick();
+    //this.onRightClick() = onRightClick();
   }
 
   public register(): void {
@@ -64,7 +64,6 @@ export class OItem {
       $world: any,
       $player: any
     ): any {
-      // You can customize item behavior here
       return $itemstack;
     };
 
