@@ -7,7 +7,7 @@
 
     EaglerForge/ModAPI by: ZXMushroom63, radmanplays, Leah Anderson(otterdev)
 */
-
+declare const AsyncSink: any;
 /**
  * A method used in Reflect Class
  * @see {@link https://eaglerforge.github.io/EaglerForgeInjector/docs/apidoc/reflect.html} Reflect Documentation

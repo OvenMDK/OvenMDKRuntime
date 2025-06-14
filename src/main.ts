@@ -31,7 +31,7 @@ ModAPI.meta.description(
 );
 ModAPI.meta.credits("Block_2222");
 ModAPI.meta.icon(icon);
-import { OItem } from "classes/core/Oven";
+import OItem from "classes/core/OItem";
 import OMod from "classes/core/Mod";
 import Oven from "classes/core/Oven";
 globalThis.OItem = OItem;
