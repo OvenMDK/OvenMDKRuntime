@@ -41,4 +41,7 @@ export default class OMod {
   static config(): void {}
   static init(): void {}
   static postInit(): void {}
+  static displayChatMessage(msg: string) {
+    ModAPI.displayToChat(msg);
+  }
 }
