@@ -45,6 +45,7 @@ export default class Oven {
     ModAPI.meta.icon(modClass.icon);
     ModAPI.meta.config(modClass.config());
     modClass.init();
+    globalThis.Debug_mode = modClass.Debug_mode;
     if (modClass.only_1_12_2 === true) {
       // Ill do some more stuff later
     }

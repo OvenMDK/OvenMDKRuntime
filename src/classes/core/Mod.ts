@@ -38,6 +38,7 @@ export default class OMod {
   static clientSideOnly: boolean = false;
   static serverSideOnly: boolean = false;
   static only_1_12_2: boolean = false;
+  static Debug_mode: boolean = false;
   static config(): void {}
   static init(): void {}
   static postInit(): void {}

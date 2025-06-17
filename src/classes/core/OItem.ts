@@ -45,6 +45,9 @@ export default class OItem {
       $player: any
     ): void {
       self.onRightClick($itemstack);
+      if (globalThis.Debug_mode === true) {
+        console.log($itemstack);
+      }
       return $itemstack;
     };
 
@@ -60,6 +63,10 @@ export default class OItem {
       );
 
       ModAPI.items[`${self.itemID}`] = itemInstance;
+      if (globalThis.Debug_mode === true) {
+        console.log(itemInstance);
+      }
+      console.log("Registering item");
       self.itemInstance = itemInstance;
 
       return itemInstance;
@@ -73,16 +80,15 @@ export default class OItem {
   }
 
   public async registerClient(): Promise<void> {
+    var custom_item = this.register();
+
     const self = this;
-    ModAPI.dedicatedServer.appendCode(() => self.register());
+    ModAPI.dedicatedServer.appendCode(() => this.register());
     ModAPI.addEventListener("lib:asyncsink", async () => {
       ModAPI.addEventListener(
         "lib:asyncsink:registeritems",
         (renderItem: any) => {
-          renderItem.registerItem(
-            self.itemInstance,
-            ModAPI.util.str(self.itemID)
-          );
+          renderItem.registerItem(custom_item, ModAPI.util.str(self.itemID));
         }
       );
 
