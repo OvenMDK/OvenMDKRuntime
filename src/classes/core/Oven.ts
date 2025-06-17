@@ -23,17 +23,6 @@
 
 import OMod from "./Mod";
 
-export class OBlock {
-  name: string;
-  material: string;
-  hardness: number;
-
-  constructor(name: string, material: string, hardness: number) {
-    this.name = name;
-    this.material = material;
-    this.hardness = hardness;
-  }
-}
 export default class Oven {
   static mods: Array<OMod> = [];
 
