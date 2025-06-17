@@ -3,9 +3,14 @@ export default class OItem {
   private itemName: string;
   private itemID: string;
   private itemInstance: any;
-  private onRightClick($itemStack): void {}
+  private onRightClick($itemstack): void {}
 
-  constructor(itemName: string, itemID: string, texture: string, onRightClick: () => void) {
+  constructor(
+    itemName: string,
+    itemID: string,
+    texture: string,
+    onRightClick: () => void
+  ) {
     this.itemName = itemName;
     this.itemID = itemID;
     this.itemTexture = texture;
@@ -34,40 +39,42 @@ export default class OItem {
 
     ModAPI.reflect.prototypeStack(itemClass, nmi_OvenItem);
 
-    nmi_OvenItem.prototype.$onItemRightClick = function ($itemStack: any): void {
-      self.onRightClick($itemStack);
-      return $itemStack;
+    nmi_OvenItem.prototype.$onItemRightClick = function (
+      $itemstack: any,
+      $world: any,
+      $player: any
+    ): void {
+      self.onRightClick($itemstack);
+      return $itemstack;
     };
 
     const internal_reg = (): any => {
       const itemInstance: any = new nmi_OvenItem().$setUnlocalizedName(
-        ModAPI.util.str(self.itemID)
+        ModAPI.util.str(`${self.itemID}`)
       );
 
       itemClass.staticMethods.registerItem.method(
-        ModAPI.keygen.item(self.itemID),
-        ModAPI.util.str(self.itemID),
+        ModAPI.keygen.item(`${self.itemID}`),
+        ModAPI.util.str(`${self.itemID}`),
         itemInstance
       );
 
-      ModAPI.items[self.itemID] = itemInstance;
+      ModAPI.items[`${self.itemID}`] = itemInstance;
       self.itemInstance = itemInstance;
 
       return itemInstance;
     };
 
     if (ModAPI.items) {
-      internal_reg();
+      return internal_reg();
     } else {
       ModAPI.addEventListener("bootstrap", internal_reg);
     }
-
-    ModAPI.dedicatedServer.appendCode(() => this.register());
   }
 
   public async registerClient(): Promise<void> {
     const self = this;
-
+    ModAPI.dedicatedServer.appendCode(() => self.register());
     ModAPI.addEventListener("lib:asyncsink", async () => {
       ModAPI.addEventListener(
         "lib:asyncsink:registeritems",
