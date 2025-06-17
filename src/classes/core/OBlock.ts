@@ -4,7 +4,7 @@ export default class OBlock {
   private blockID: string;
   private blockInstance: any;
   private onBreak: (world: any, pos: any, state: any) => void;
-
+  // block class auauauua
   constructor(
     blockName: string,
     blockID: string,
