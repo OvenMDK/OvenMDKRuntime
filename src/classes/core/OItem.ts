@@ -3,13 +3,13 @@ export default class OItem {
   private itemName: string;
   private itemID: string;
   private itemInstance: any;
-  private onRightClick($itemstack): void {}
+  private onRightClick: ($itemstack: any) => void;
 
   constructor(
     itemName: string,
     itemID: string,
     texture: string,
-    onRightClick: () => void
+    onRightClick: ($itemstack: any) => void
   ) {
     this.itemName = itemName;
     this.itemID = itemID;
@@ -81,9 +81,15 @@ export default class OItem {
 
   public async registerClient(): Promise<void> {
     var custom_item = this.register();
-
     const self = this;
-    ModAPI.dedicatedServer.appendCode(() => this.register());
+    const custom_item_data = new OItem(
+      self.itemName,
+      self.itemID,
+      self.itemTexture,
+      self.onRightClick
+    );
+
+    ModAPI.dedicatedServer.appendCode(() => custom_item_data.register());
     ModAPI.addEventListener("lib:asyncsink", async () => {
       ModAPI.addEventListener(
         "lib:asyncsink:registeritems",
