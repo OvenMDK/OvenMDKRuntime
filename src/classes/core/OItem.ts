@@ -52,20 +52,22 @@ export default class OItem {
     };
 
     const internal_reg = (): any => {
+      const self = this;
       const itemInstance: any = new nmi_OvenItem().$setUnlocalizedName(
-        ModAPI.util.str(`${self.itemID}`)
+        ModAPI.util.str(self.itemID)
       );
 
       itemClass.staticMethods.registerItem.method(
-        ModAPI.keygen.item(`${self.itemID}`),
-        ModAPI.util.str(`${self.itemID}`),
+        ModAPI.keygen.item(self.itemID),
+        ModAPI.util.str(self.itemID),
         itemInstance
       );
 
-      ModAPI.items[`${self.itemID}`] = itemInstance;
-      if (globalThis.Debug_mode === true) {
-        console.log(itemInstance);
-      }
+      ModAPI.items[self.itemID] = itemInstance;
+      console.log("item instance");
+      console.log(itemInstance);
+      console.log("logging uh idfk");
+      console.log(self.itemID);
       console.log("Registering item");
       self.itemInstance = itemInstance;
 
@@ -75,37 +77,46 @@ export default class OItem {
     if (ModAPI.items) {
       return internal_reg();
     } else {
-      ModAPI.addEventListener("bootstrap", internal_reg);
+      const internal_reg_modified = (): any => {
+        ModAPI.util.modifyFunction(internal_reg, (code) => {
+          return code.replaceAll("self.itemID", self.itemID);
+        });
+      };
+      ModAPI.addEventListener("bootstrap", internal_reg_modified);
     }
   }
 
   public async registerClient(): Promise<void> {
-    var custom_item = this.register();
-    const self = this;
-    const custom_item_data = new OItem(
-      self.itemName,
-      self.itemID,
-      self.itemTexture,
-      self.onRightClick
+    const custom_item = new OItem(
+      this.itemName,
+      this.itemID,
+      this.itemTexture,
+      this.onRightClick
+    ).register();
+    ModAPI.dedicatedServer.appendCode(
+      const serversidedfunction = new OItem(
+        this.itemName,
+        this.itemID,
+        this.itemTexture,
+        this.onRightClick
+      )
     );
-
-    ModAPI.dedicatedServer.appendCode(() => custom_item_data.register());
     ModAPI.addEventListener("lib:asyncsink", async () => {
       ModAPI.addEventListener(
         "lib:asyncsink:registeritems",
         (renderItem: any) => {
-          renderItem.registerItem(custom_item, ModAPI.util.str(self.itemID));
+          renderItem.registerItem(custom_item, ModAPI.util.str(this.itemID));
         }
       );
 
-      AsyncSink.L10N.set(`item.${self.itemID}.name`, self.itemName);
+      AsyncSink.L10N.set(`item.${this.itemID}.name`, this.itemName);
 
       AsyncSink.setFile(
-        `resourcepacks/AsyncSinkLib/assets/minecraft/models/item/${self.itemID}.json`,
+        `resourcepacks/AsyncSinkLib/assets/minecraft/models/item/${this.itemID}.json`,
         JSON.stringify({
           parent: "builtin/generated",
           textures: {
-            layer0: `items/${self.itemID}`,
+            layer0: `items/${this.itemID}`,
           },
           display: {
             thirdperson: {
@@ -122,11 +133,11 @@ export default class OItem {
         })
       );
 
-      const response = await fetch(self.itemTexture);
+      const response = await fetch(this.itemTexture);
       const buffer = await response.arrayBuffer();
 
       AsyncSink.setFile(
-        `resourcepacks/AsyncSinkLib/assets/minecraft/textures/items/${self.itemID}.png`,
+        `resourcepacks/AsyncSinkLib/assets/minecraft/textures/items/${this.itemID}.png`,
         buffer
       );
     });

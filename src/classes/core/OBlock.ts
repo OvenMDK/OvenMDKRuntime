@@ -114,13 +114,10 @@ export default class OBlock {
     const custom_block = this.register();
 
     const self = this;
-    const custom_block_data = new OBlock(
-      self.blockName,
-      self.blockID,
-      self.blockTexture,
-      self.onBreak
+    ModAPI.dedicatedServer.appendCode(
+      new OBlock(this.blockName, this.blockID, this.blockTexture, this.onBreak)
+        .register
     );
-    ModAPI.dedicatedServer.appendCode(() => custom_block_data.register());
 
     ModAPI.addEventListener("lib:asyncsink", async () => {
       ModAPI.addEventListener(
