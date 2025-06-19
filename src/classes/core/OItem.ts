@@ -17,7 +17,10 @@ export default class OItem {
     this.onRightClick = onRightClick;
   }
 
-  public register(): void {
+  public registerServer(
+    itemID: string,
+    onRightClick: ($itemstack: any) => void
+  ): void {
     const creativeMiscTab: any = ModAPI.reflect.getClassById(
       "net.minecraft.creativetab.CreativeTabs"
     ).staticVariables.tabMisc;
@@ -29,8 +32,6 @@ export default class OItem {
       itemClass,
       (fn: Function) => fn.length === 1
     );
-
-    const self = this;
 
     function nmi_OvenItem(this: any): void {
       itemSuper(this);
@@ -44,7 +45,7 @@ export default class OItem {
       $world: any,
       $player: any
     ): void {
-      self.onRightClick($itemstack);
+      onRightClick($itemstack);
       if (globalThis.Debug_mode === true) {
         console.log($itemstack);
       }
@@ -52,24 +53,22 @@ export default class OItem {
     };
 
     const internal_reg = (): any => {
-      const self = this;
       const itemInstance: any = new nmi_OvenItem().$setUnlocalizedName(
-        ModAPI.util.str(self.itemID)
+        ModAPI.util.str(itemID)
       );
 
       itemClass.staticMethods.registerItem.method(
-        ModAPI.keygen.item(self.itemID),
-        ModAPI.util.str(self.itemID),
+        ModAPI.keygen.item(itemID),
+        ModAPI.util.str(itemID),
         itemInstance
       );
 
-      ModAPI.items[self.itemID] = itemInstance;
+      ModAPI.items[itemID] = itemInstance;
       console.log("item instance");
       console.log(itemInstance);
       console.log("logging uh idfk");
-      console.log(self.itemID);
+      console.log(itemID);
       console.log("Registering item");
-      self.itemInstance = itemInstance;
 
       return itemInstance;
     };
@@ -77,46 +76,33 @@ export default class OItem {
     if (ModAPI.items) {
       return internal_reg();
     } else {
-      const internal_reg_modified = (): any => {
-        ModAPI.util.modifyFunction(internal_reg, (code) => {
-          return code.replaceAll("self.itemID", self.itemID);
-        });
-      };
-      ModAPI.addEventListener("bootstrap", internal_reg_modified);
+      ModAPI.addEventListener("bootstrap", internal_reg);
     }
   }
 
-  public async registerClient(): Promise<void> {
-    const custom_item = new OItem(
-      this.itemName,
-      this.itemID,
-      this.itemTexture,
-      this.onRightClick
-    ).register();
+  public async register(): Promise<void> {
+    const self = this;
+    const custom_item = new self.registerServer(self.itemID, self.onRightClick);
     ModAPI.dedicatedServer.appendCode(
-      const serversidedfunction = new OItem(
-        this.itemName,
-        this.itemID,
-        this.itemTexture,
-        this.onRightClick
-      )
+      new self.registerServer(self.itemID, self.onRightClick)
     );
+
     ModAPI.addEventListener("lib:asyncsink", async () => {
       ModAPI.addEventListener(
         "lib:asyncsink:registeritems",
         (renderItem: any) => {
-          renderItem.registerItem(custom_item, ModAPI.util.str(this.itemID));
+          renderItem.registerItem(custom_item, ModAPI.util.str(self.itemID));
         }
       );
 
-      AsyncSink.L10N.set(`item.${this.itemID}.name`, this.itemName);
+      AsyncSink.L10N.set(`item.${self.itemID}.name`, self.itemName);
 
       AsyncSink.setFile(
-        `resourcepacks/AsyncSinkLib/assets/minecraft/models/item/${this.itemID}.json`,
+        `resourcepacks/AsyncSinkLib/assets/minecraft/models/item/${self.itemID}.json`,
         JSON.stringify({
           parent: "builtin/generated",
           textures: {
-            layer0: `items/${this.itemID}`,
+            layer0: `items/${self.itemID}`,
           },
           display: {
             thirdperson: {
@@ -133,11 +119,11 @@ export default class OItem {
         })
       );
 
-      const response = await fetch(this.itemTexture);
+      const response = await fetch(self.itemTexture);
       const buffer = await response.arrayBuffer();
 
       AsyncSink.setFile(
-        `resourcepacks/AsyncSinkLib/assets/minecraft/textures/items/${this.itemID}.png`,
+        `resourcepacks/AsyncSinkLib/assets/minecraft/textures/items/${self.itemID}.png`,
         buffer
       );
     });
