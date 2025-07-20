@@ -4,13 +4,13 @@ export default class OItem {
   private itemName: string;
   private itemID: string;
   private itemInstance: any;
-  private onRightClick($itemstack): void {}
+  private onRightClick: ($itemstack: any) => void;
 
   constructor(
     itemName: string,
     itemID: string,
     texture: string,
-    onRightClick: () => void
+    onRightClick: ($itemstack: any) => void
   ) {
     this.itemName = itemName;
     this.itemID = itemID;
@@ -31,8 +31,6 @@ export default class OItem {
       (fn: Function) => fn.length === 1
     );
 
-    const self = this;
-
     function nmi_OvenItem(this: any): void {
       itemSuper(this);
       this.$setCreativeTab(creativeMiscTab);
@@ -52,12 +50,12 @@ export default class OItem {
 
     const internal_reg = (): any => {
       const itemInstance: any = new nmi_OvenItem().$setUnlocalizedName(
-        ModAPI.util.str(`${self.itemID}`)
+        ModAPI.util.str(itemID)
       );
 
       itemClass.staticMethods.registerItem.method(
-        ModAPI.keygen.item(`${self.itemID}`),
-        ModAPI.util.str(`${self.itemID}`),
+        ModAPI.keygen.item(itemID),
+        ModAPI.util.str(itemID),
         itemInstance
       );
 
@@ -65,7 +63,6 @@ export default class OItem {
         console.log(itemInstance);
 
       console.log("Registering item");
-      self.itemInstance = itemInstance;
 
       return itemInstance;
     };

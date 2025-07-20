@@ -41,4 +41,4 @@ globalThis.registerServerBlock = registerServerBlock;
 globalThis.OItem = OItem;
 globalThis.OMod = OMod;
 globalThis.OvenMDK = Oven;
-globalThis.OBlock = OBlock;
+//globalThis.OBlock = OBlock;
