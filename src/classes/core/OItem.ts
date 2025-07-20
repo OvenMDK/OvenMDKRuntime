@@ -37,7 +37,7 @@ export default class OItem {
     }
 
     ModAPI.reflect.prototypeStack(itemClass, nmi_OvenItem);
-
+    const self = this;
     nmi_OvenItem.prototype.$onItemRightClick = function (
       $itemstack: any,
       $world: any,
@@ -50,12 +50,12 @@ export default class OItem {
 
     const internal_reg = (): any => {
       const itemInstance: any = new nmi_OvenItem().$setUnlocalizedName(
-        ModAPI.util.str(itemID)
+        ModAPI.util.str(this.itemID)
       );
 
       itemClass.staticMethods.registerItem.method(
-        ModAPI.keygen.item(itemID),
-        ModAPI.util.str(itemID),
+        ModAPI.keygen.item(this.itemID),
+        ModAPI.util.str(this.itemID),
         itemInstance
       );
 
