@@ -1,0 +1,155 @@
+export function registerServerItem(itemID: string, onRightClick: ($itemstack: any) => void) {
+    if (ModAPI.isServer === false) {
+        console.log("registerServerItem can only be used on the server side.");
+        return;
+    }
+    const creativeMiscTab: any = ModAPI.reflect.getClassById(
+        "net.minecraft.creativetab.CreativeTabs"
+    ).staticVariables.tabMisc;
+
+    const itemClass: any = ModAPI.reflect.getClassById(
+        "net.minecraft.item.Item"
+    );
+    const itemSuper: any = ModAPI.reflect.getSuper(
+        itemClass,
+        (fn: Function) => fn.length === 1
+    );
+
+
+
+    function nmi_OvenItem(this: any): void {
+        itemSuper(this);
+        this.$setCreativeTab(creativeMiscTab);
+    }
+
+    ModAPI.reflect.prototypeStack(itemClass, nmi_OvenItem);
+
+    nmi_OvenItem.prototype.$onItemRightClick = function (
+        $itemstack: any,
+        $world: any,
+        $player: any
+    ): void {
+        onRightClick($itemstack);
+        console.log($itemstack);
+        return $itemstack;
+    };
+
+    const internal_reg = (): any => {
+        const itemInstance: any = new nmi_OvenItem().$setUnlocalizedName(
+            ModAPI.util.str(`${itemID}`)
+        );
+
+        itemClass.staticMethods.registerItem.method(
+            ModAPI.keygen.item(`${itemID}`),
+            ModAPI.util.str(`${itemID}`),
+            itemInstance
+        );
+
+        ModAPI.items[`${itemID}`] = itemInstance;
+        console.log(itemInstance);
+        console.log("Registering item");
+
+        return itemInstance;
+    };
+
+    if (ModAPI.items) {
+        return internal_reg();
+    } else {
+        ModAPI.addEventListener("bootstrap", internal_reg);
+    }
+}
+export function registerServerBlock(blockID: string, onBreak: ($world: any, $blockpos: any, $blockstate: any) => void) {
+    if (ModAPI.isServer === false) {
+        console.log("registerServerBlock can only be used on the server side.");
+        return;
+    }
+    const BlockClass = ModAPI.reflect.getClassById("net.minecraft.block.Block");
+    const ItemClass = ModAPI.reflect.getClassById("net.minecraft.item.Item");
+
+    const creativeTab = ModAPI.reflect.getClassById(
+        "net.minecraft.creativetab.CreativeTabs"
+    ).staticVariables.tabBlock;
+
+    const blockSuper = ModAPI.reflect.getSuper(
+        BlockClass,
+        (fn: Function) => fn.length === 2
+    );
+    const breakBlockMethod = BlockClass.methods.breakBlock.method;
+
+
+
+    function CustomBlock(this: any): void {
+        blockSuper(this, ModAPI.materials.rock.getRef());
+        this.$defaultBlockState = this.$blockState.$getBaseState();
+        this.$setCreativeTab(creativeTab);
+    }
+
+    ModAPI.reflect.prototypeStack(BlockClass, CustomBlock);
+
+    CustomBlock.prototype.$breakBlock = function (
+        $world: any,
+        $blockpos: any,
+        $blockstate: any
+    ): boolean {
+        onBreak($world, $blockpos, $blockstate);
+        return breakBlockMethod(this, $world, $blockpos, $blockstate);
+    };
+    function fixupBlockIds() {
+        const blockRegistry = ModAPI.util
+          .wrap(
+            ModAPI.reflect.getClassById("net.minecraft.block.Block").staticVariables
+              .blockRegistry
+          )
+          .getCorrective();
+    
+        const BLOCK_STATE_IDS = ModAPI.util
+          .wrap(
+            ModAPI.reflect.getClassById("net.minecraft.block.Block").staticVariables
+              .BLOCK_STATE_IDS
+          )
+          .getCorrective();
+    
+        blockRegistry.registryObjects.hashTableKToV.forEach(
+          (entry: { value: any }) => {
+            if (entry) {
+              const block = entry.value;
+              const validStates = block.getBlockState().getValidStates();
+              const stateArray = validStates.array || [validStates.element];
+              stateArray.forEach((iblockstate: any) => {
+                const i =
+                  (blockRegistry.getIDForObject(block.getRef()) << 4) |
+                  block.getMetaFromState(iblockstate.getRef());
+                BLOCK_STATE_IDS.put(iblockstate.getRef(), i);
+              });
+            }
+          }
+        );
+      }
+    const internalRegister = (): any => {
+        const custom_block = new CustomBlock()
+            .$setHardness(3.0)
+            .$setStepSound(BlockClass.staticVariables.soundTypePiston)
+            .$setUnlocalizedName(ModAPI.util.str(blockID));
+
+        BlockClass.staticMethods.registerBlock0.method(
+            ModAPI.keygen.block(blockID),
+            ModAPI.util.str(blockID),
+            custom_block
+        );
+
+        ItemClass.staticMethods.registerItemBlock0.method(custom_block);
+
+        fixupBlockIds();
+        ModAPI.blocks[blockID] = custom_block;
+        console.log("Registering block");
+        console.log(custom_block);
+        return custom_block;
+    };
+
+    if (ModAPI.materials) {
+        return internalRegister();
+    } else {
+        ModAPI.addEventListener("bootstrap", internalRegister);
+    }
+}
+

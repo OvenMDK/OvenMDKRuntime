@@ -1,3 +1,4 @@
+
 export default class OBlock {
   private blockTexture: string;
   private blockName: string;
@@ -27,7 +28,7 @@ export default class OBlock {
 
     const blockSuper = ModAPI.reflect.getSuper(
       BlockClass,
-      (x: any[]) => x.length === 2
+      (fn: Function) => fn.length === 2
     );
     const breakBlockMethod = BlockClass.methods.breakBlock.method;
 
@@ -67,7 +68,8 @@ export default class OBlock {
       this.fixupBlockIds();
       ModAPI.blocks[this.blockID] = custom_block;
       this.blockInstance = custom_block;
-
+      console.log("Registered block: " + this.blockID);
+      console.log(custom_block);
       return custom_block;
     };
 
@@ -111,11 +113,11 @@ export default class OBlock {
   }
 
   public async registerBlock(): Promise<void> {
-    const custom_block = this.register();
+    var custom_block = new OBlock(this.blockName, this.blockID, this.blockTexture, () => this.onBreak).register();
 
     const self = this;
 
-    ModAPI.dedicatedServer.appendCode(() => this.register());
+    ModAPI.dedicatedServer.appendCode(globalThis.registerServerBlock(this.blockID, this.onBreak));
 
     ModAPI.addEventListener("lib:asyncsink", async () => {
       ModAPI.addEventListener(
@@ -126,7 +128,7 @@ export default class OBlock {
       );
 
       AsyncSink.L10N.set(`tile.${self.blockID}.name`, self.blockName);
-
+      console.log(`Set localization for block ${self.blockID}`);
       AsyncSink.setFile(
         `resourcepacks/AsyncSinkLib/assets/minecraft/models/block/${self.blockID}.json`,
         JSON.stringify({

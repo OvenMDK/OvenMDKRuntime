@@ -1,3 +1,4 @@
+
 export default class OItem {
   private itemTexture: string;
   private itemName: string;
@@ -17,7 +18,7 @@ export default class OItem {
     this.onRightClick = onRightClick;
   }
 
-  public register(): void {
+  public registerClient(): void {
     const creativeMiscTab: any = ModAPI.reflect.getClassById(
       "net.minecraft.creativetab.CreativeTabs"
     ).staticVariables.tabMisc;
@@ -45,9 +46,7 @@ export default class OItem {
       $player: any
     ): void {
       self.onRightClick($itemstack);
-      if (globalThis.Debug_mode === true) {
-        console.log($itemstack);
-      }
+      console.log($itemstack);
       return $itemstack;
     };
 
@@ -63,9 +62,8 @@ export default class OItem {
       );
 
       ModAPI.items[`${self.itemID}`] = itemInstance;
-      if (globalThis.Debug_mode === true) {
         console.log(itemInstance);
-      }
+
       console.log("Registering item");
       self.itemInstance = itemInstance;
 
@@ -79,11 +77,11 @@ export default class OItem {
     }
   }
 
-  public async registerClient(): Promise<void> {
-    var custom_item = this.register();
+  public async register(): Promise<void> {
 
     const self = this;
-    ModAPI.dedicatedServer.appendCode(() => this.register());
+    var custom_item = new OItem(this.itemName, this.itemID, this.itemTexture, () => this.onRightClick).registerClient();
+    ModAPI.dedicatedServer.appendCode(globalThis.registerServerItem(this.itemID, this.onRightClick));
     ModAPI.addEventListener("lib:asyncsink", async () => {
       ModAPI.addEventListener(
         "lib:asyncsink:registeritems",

@@ -53,7 +53,7 @@ declare namespace ModAPI {
      * GNU lmao
      */
     let GNU: string;
-    
+    let isServer: boolean;
     /**
      * Lets you easily add credits to Eaglercraft’s credits.txt
      * @example
