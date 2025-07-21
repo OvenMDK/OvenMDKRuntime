@@ -3,17 +3,20 @@ export default class OItem {
   private itemTexture: string;
   private itemName: string;
   private itemID: string;
+  private itemStack: number;
   private itemInstance: any;
   private onRightClick: ($itemstack: any) => void;
 
   constructor(
     itemName: string,
     itemID: string,
+    itemStack: number,
     texture: string,
     onRightClick: ($itemstack: any) => void
   ) {
     this.itemName = itemName;
     this.itemID = itemID;
+    this.itemStack = itemStack;
     this.itemTexture = texture;
     this.onRightClick = onRightClick;
   }
@@ -31,21 +34,24 @@ export default class OItem {
       itemClass,
       (fn: Function) => fn.length === 1
     );
-
+    const itemStack = this.itemStack;
+    const self = this;
     function nmi_OvenItem(this: any): void {
       itemSuper(this);
       this.$setCreativeTab(creativeMiscTab);
-      this.$maxStackSize = (64);
+      this.$maxStackSize = (itemStack);
     }
 
     ModAPI.reflect.prototypeStack(itemClass, nmi_OvenItem);
-    const self = this;
     nmi_OvenItem.prototype.$onItemRightClick = function (
       $$itemstack: any,
       $$world: any,
       $$player: any
     ): void {
-      //self.onRightClick($$itemstack);
+      self.onRightClick($$itemstack);
+      ($$player).$setItemInUse($$itemstack,32);
+      var $$itemstack,$$world,$$player;
+      console.log(`client itemstack:`);
       console.log($$itemstack);
       return ($$itemstack);
     };
@@ -86,7 +92,7 @@ export default class OItem {
       ModAPI.items[`${self.itemID}`] = itemInstance;
       console.log(itemInstance);
 
-      console.log("Registering item");
+      console.log("Registered OvenMDK item ( client side )");
 
       return itemInstance;
     };
@@ -98,11 +104,11 @@ export default class OItem {
     }
   }
 
-  public async register(): Promise<void> {
+  public async registerItem(): Promise<void> {
 
     const self = this;
-    var custom_item = new OItem(this.itemName, this.itemID, this.itemTexture, this.onRightClick).registerClient();
-    ModAPI.dedicatedServer.appendCode(globalThis.registerServerItem(this.itemID, this.onRightClick));
+    var custom_item = new OItem(this.itemName, this.itemID, this.itemStack, this.itemTexture, this.onRightClick).registerClient();
+    ModAPI.dedicatedServer.appendCode(`globalThis.registerServerItem("${this.itemID}", ${this.itemStack}, ${this.onRightClick});`);
     ModAPI.addEventListener("lib:asyncsink", async () => {
       ModAPI.addEventListener(
         "lib:asyncsink:registeritems",

@@ -1,8 +1,8 @@
-export function registerServerItem(itemID: string, onRightClick: ($$itemstack: any) => void) {
-    if (ModAPI.isServer === false) {
+export function registerServerItem(itemID: string, itemStack: number, onRightClick: ($$itemstack: any) => void) {
+    /*if (isServer === false) {
         console.log("registerServerItem can only be used on the server side.");
         return;
-    }
+    }*/
     const creativeMiscTab: any = ModAPI.reflect.getClassById(
         "net.minecraft.creativetab.CreativeTabs"
     ).staticVariables.tabMisc;
@@ -15,12 +15,14 @@ export function registerServerItem(itemID: string, onRightClick: ($$itemstack: a
         (fn: Function) => fn.length === 1
     );
 
-
+    /*if (isServer === true) {
+        console.log("using server side registerServerItem"); 
+    }*/
 
     function nmi_OvenItem(this: any): void {
         itemSuper(this);
         this.$setCreativeTab(creativeMiscTab);
-        this.$maxStackSize = (64);
+        this.$maxStackSize = (itemStack);
     }
 
     ModAPI.reflect.prototypeStack(itemClass, nmi_OvenItem);
@@ -30,7 +32,10 @@ export function registerServerItem(itemID: string, onRightClick: ($$itemstack: a
         $$world: any,
         $$player: any
     ): void {
-        onRightClick($$itemstack);
+        ($$player).$setItemInUse($$itemstack,32);
+        var $$itemstack,$$world,$$player;
+        //onRightClick($$itemstack);
+        console.log(`server itemstack:`);
         console.log($$itemstack);
         return ($$itemstack);
     };
@@ -70,7 +75,7 @@ export function registerServerItem(itemID: string, onRightClick: ($$itemstack: a
 
         ModAPI.items[`${itemID}`] = itemInstance;
         console.log(itemInstance);
-        console.log("Registering item");
+        console.log("Registered OvenMDK item ( Server Side )");
 
         return itemInstance;
     };
@@ -82,10 +87,10 @@ export function registerServerItem(itemID: string, onRightClick: ($$itemstack: a
     }
 }
 export function registerServerBlock(blockID: string, onBreak: ($world: any, $blockpos: any, $blockstate: any) => void) {
-    if (ModAPI.isServer === false) {
+    /*if (ModAPI.isServer === false) {
         console.log("registerServerBlock can only be used on the server side.");
         return;
-    }
+    }*/
     const BlockClass = ModAPI.reflect.getClassById("net.minecraft.block.Block");
     const ItemClass = ModAPI.reflect.getClassById("net.minecraft.item.Item");
 
@@ -114,7 +119,7 @@ export function registerServerBlock(blockID: string, onBreak: ($world: any, $blo
         $blockpos: any,
         $blockstate: any
     ): boolean {
-        onBreak($world, $blockpos, $blockstate);
+        //onBreak($world, $blockpos, $blockstate);
         return breakBlockMethod(this, $world, $blockpos, $blockstate);
     };
     function fixupBlockIds() {
@@ -176,3 +181,12 @@ export function registerServerBlock(blockID: string, onBreak: ($world: any, $blo
     }
 }
 
+/*export function isServerSide() {
+    function subfunction() {
+        console.log("isServerSide function called");
+        console.log(`isServerSide: ${ModAPI.isServer}`);
+        console.log(ModAPI.isServer);
+    }
+    subfunction();
+    console.log(`isServerSide: ${ModAPI.isServer}`);
+}*/

@@ -31,25 +31,19 @@ ModAPI.meta.description(
 );
 ModAPI.meta.credits("Block_2222");
 ModAPI.meta.icon(icon);
+import { registerServerItem, registerServerBlock } from "classes/core/Helper_func";
 import OItem from "classes/core/OItem";
 import OMod from "classes/core/Mod";
 import Oven from "classes/core/Oven";
 import OBlock from "classes/core/OBlock";
-import { registerServerItem, registerServerBlock } from "classes/core/Helper_func";
+
 globalThis.registerServerItem = registerServerItem;
 globalThis.registerServerBlock = registerServerBlock;
 globalThis.OItem = OItem;
 globalThis.OMod = OMod;
 globalThis.OvenMDK = Oven;
 globalThis.OBlock = OBlock;
-ModAPI.addEventListener("load", () => {
-  console.log(`
-    ┌───────────────────────────────────┐
-    │                                   │
-    │   welcome to OvenMDK              │
-    │                                   │
-    │   A mod maker kit for starters    │
-    │                                   │
-    └───────────────────────────────────┘
-    `);
-});
+//globalThis.isServerSide = isServerSide;
+ModAPI.dedicatedServer.appendCode(`globalThis.registerServerItem = ${registerServerItem};`);
+ModAPI.dedicatedServer.appendCode(`globalThis.registerServerBlock = ${registerServerBlock};`);
+console.log("OvenMDK Runtime initialized");

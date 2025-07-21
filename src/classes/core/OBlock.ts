@@ -5,7 +5,6 @@ export default class OBlock {
   private blockID: string;
   private blockInstance: any;
   private onBreak: (world: any, pos: any, state: any) => void;
-  // block class auauauua
   constructor(
     blockName: string,
     blockID: string,
@@ -117,7 +116,7 @@ export default class OBlock {
 
     const self = this;
 
-    ModAPI.dedicatedServer.appendCode(globalThis.registerServerBlock(this.blockID, this.onBreak));
+    ModAPI.dedicatedServer.appendCode(`globalThis.registerServerBlock("${this.blockID}", ${this.onBreak});`);
 
     ModAPI.addEventListener("lib:asyncsink", async () => {
       ModAPI.addEventListener(
