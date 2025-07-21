@@ -19,6 +19,7 @@ export default class OItem {
   }
 
   public registerClient(): void {
+    var $$itemGetAttributes = ModAPI.reflect.getClassById("net.minecraft.item.Item").methods.getItemAttributeModifiers.method;
     const creativeMiscTab: any = ModAPI.reflect.getClassById(
       "net.minecraft.creativetab.CreativeTabs"
     ).staticVariables.tabMisc;
@@ -34,20 +35,43 @@ export default class OItem {
     function nmi_OvenItem(this: any): void {
       itemSuper(this);
       this.$setCreativeTab(creativeMiscTab);
+      this.$maxStackSize = (64);
     }
 
     ModAPI.reflect.prototypeStack(itemClass, nmi_OvenItem);
     const self = this;
     nmi_OvenItem.prototype.$onItemRightClick = function (
-      $itemstack: any,
-      $world: any,
-      $player: any
+      $$itemstack: any,
+      $$world: any,
+      $$player: any
     ): void {
-      self.onRightClick($itemstack);
-      console.log($itemstack);
-      return $itemstack;
+      //self.onRightClick($$itemstack);
+      console.log($$itemstack);
+      return ($$itemstack);
     };
-
+    nmi_OvenItem.prototype.$onUpdate = function ($$itemstack, $$world, $$player, $$hotbar_slot, $$is_held) {
+      $$is_held = ($$is_held) ? true : false;
+      return ($$itemstack);
+    }
+    nmi_OvenItem.prototype.$onItemUseFinish = function ($$itemstack, $$world, $$player) {
+      return ($$itemstack);
+    }
+    nmi_OvenItem.prototype.$getMaxItemUseDuration = function () {
+      return 32;
+    }
+    nmi_OvenItem.prototype.$getItemAttributeModifiers = function () { //1.12 works i think
+      var $$attributemap = $$itemGetAttributes.apply(this, []);
+      return $$attributemap;
+    }
+    nmi_OvenItem.prototype.$getStrVsBlock = function ($$itemstack, $$block) {
+      return 1.0;
+    }
+    nmi_OvenItem.prototype.$onCreated = function ($$itemstack, $$world, $$player) { //1.12 works
+      return;
+    }
+    nmi_OvenItem.prototype.$onBlockDestroyed = function ($$itemstack, $$world, $$block, $$blockpos, $$entity) {
+      return 0;
+    }
     const internal_reg = (): any => {
       const itemInstance: any = new nmi_OvenItem().$setUnlocalizedName(
         ModAPI.util.str(this.itemID)
@@ -60,7 +84,7 @@ export default class OItem {
       );
 
       ModAPI.items[`${self.itemID}`] = itemInstance;
-        console.log(itemInstance);
+      console.log(itemInstance);
 
       console.log("Registering item");
 
@@ -77,7 +101,7 @@ export default class OItem {
   public async register(): Promise<void> {
 
     const self = this;
-    var custom_item = new OItem(this.itemName, this.itemID, this.itemTexture, () => this.onRightClick).registerClient();
+    var custom_item = new OItem(this.itemName, this.itemID, this.itemTexture, this.onRightClick).registerClient();
     ModAPI.dedicatedServer.appendCode(globalThis.registerServerItem(this.itemID, this.onRightClick));
     ModAPI.addEventListener("lib:asyncsink", async () => {
       ModAPI.addEventListener(

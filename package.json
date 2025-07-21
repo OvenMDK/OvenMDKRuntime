@@ -4,8 +4,8 @@
   "description": "Dev kit used for simplifying EaglerForge mod development.",
   "scripts": {
     "build": "webpack --config webpack.config.js",
-    "build-bun": "bun build --bundle ./src/main.ts --outdir=build/ --outfile=build/NAME.js --sourcemap=inline --watch --target browser --entry-naming EaglerForge-[hash].js",
-    "build-es": "esbuild --bundle ./src/main.ts --outfile=build/NAME.js --sourcemap=inline --watch=forever"
+    "build-bun": "npx bun build --bundle ./src/main.ts --outdir=build/ --outfile=build/NAME.js --sourcemap=inline --watch --target browser --entry-naming EaglerForge-[hash].js",
+    "build-es": "npx esbuild --bundle ./src/main.ts --outfile=build/NAME.js --sourcemap=inline --watch=forever"
   },
   "author": "Block_2222",
   "devDependencies": {

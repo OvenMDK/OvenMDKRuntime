@@ -1,11 +1,11 @@
 /*
-	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	Oven Mod Development Kit (OvenMDK) Runtime
-	Dev kit used for simplifying EaglerForge mod development.
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Oven Mod Development Kit (OvenMDK) Runtime
+  Dev kit used for simplifying EaglerForge mod development.
 	
-	Copyright 2025 Block_2222
+  Copyright 2025 Block_2222
     Licenced under GNU LGPL-3.0-or-later
-	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     This file is part of OvenMDK.
 
@@ -41,4 +41,15 @@ globalThis.registerServerBlock = registerServerBlock;
 globalThis.OItem = OItem;
 globalThis.OMod = OMod;
 globalThis.OvenMDK = Oven;
-//globalThis.OBlock = OBlock;
+globalThis.OBlock = OBlock;
+ModAPI.addEventListener("load", () => {
+  console.log(`
+    ┌───────────────────────────────────┐
+    │                                   │
+    │   welcome to OvenMDK              │
+    │                                   │
+    │   A mod maker kit for starters    │
+    │                                   │
+    └───────────────────────────────────┘
+    `);
+});

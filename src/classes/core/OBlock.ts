@@ -68,7 +68,7 @@ export default class OBlock {
       this.fixupBlockIds();
       ModAPI.blocks[this.blockID] = custom_block;
       this.blockInstance = custom_block;
-      console.log("Registered block: " + this.blockID);
+      console.log("Registered block on client: " + this.blockID);
       console.log(custom_block);
       return custom_block;
     };
@@ -113,7 +113,7 @@ export default class OBlock {
   }
 
   public async registerBlock(): Promise<void> {
-    var custom_block = new OBlock(this.blockName, this.blockID, this.blockTexture, () => this.onBreak).register();
+    var custom_block = new OBlock(this.blockName, this.blockID, this.blockTexture, this.onBreak).register();
 
     const self = this;
 

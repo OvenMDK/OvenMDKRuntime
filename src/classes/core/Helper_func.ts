@@ -1,4 +1,4 @@
-export function registerServerItem(itemID: string, onRightClick: ($itemstack: any) => void) {
+export function registerServerItem(itemID: string, onRightClick: ($$itemstack: any) => void) {
     if (ModAPI.isServer === false) {
         console.log("registerServerItem can only be used on the server side.");
         return;
@@ -6,7 +6,7 @@ export function registerServerItem(itemID: string, onRightClick: ($itemstack: an
     const creativeMiscTab: any = ModAPI.reflect.getClassById(
         "net.minecraft.creativetab.CreativeTabs"
     ).staticVariables.tabMisc;
-
+    const $$itemGetAttributes = ModAPI.reflect.getClassById("net.minecraft.item.Item").methods.getItemAttributeModifiers.method;
     const itemClass: any = ModAPI.reflect.getClassById(
         "net.minecraft.item.Item"
     );
@@ -20,22 +20,45 @@ export function registerServerItem(itemID: string, onRightClick: ($itemstack: an
     function nmi_OvenItem(this: any): void {
         itemSuper(this);
         this.$setCreativeTab(creativeMiscTab);
+        this.$maxStackSize = (64);
     }
 
     ModAPI.reflect.prototypeStack(itemClass, nmi_OvenItem);
 
     nmi_OvenItem.prototype.$onItemRightClick = function (
-        $itemstack: any,
-        $world: any,
-        $player: any
+        $$itemstack: any,
+        $$world: any,
+        $$player: any
     ): void {
-        onRightClick($itemstack);
-        console.log($itemstack);
-        return $itemstack;
+        onRightClick($$itemstack);
+        console.log($$itemstack);
+        return ($$itemstack);
     };
-
+    nmi_OvenItem.prototype.$onUpdate = function ($$itemstack, $$world, $$player, $$hotbar_slot, $$is_held) {
+        $$is_held = ($$is_held) ? true : false;
+        return ($$itemstack);
+    }
+    nmi_OvenItem.prototype.$onItemUseFinish = function ($$itemstack, $$world, $$player) {
+        return ($$itemstack);
+    }
+    nmi_OvenItem.prototype.$getMaxItemUseDuration = function () {
+        return 32;
+    }
+    nmi_OvenItem.prototype.$getItemAttributeModifiers = function () { //1.12 works i think
+        var $$attributemap = $$itemGetAttributes.apply(this, []);
+        return $$attributemap;
+    }
+    nmi_OvenItem.prototype.$getStrVsBlock = function ($$itemstack, $$block) {
+        return 1.0;
+    }
+    nmi_OvenItem.prototype.$onCreated = function ($$itemstack, $$world, $$player) { //1.12 works
+        return;
+    }
+    nmi_OvenItem.prototype.$onBlockDestroyed = function ($$itemstack, $$world, $$block, $$blockpos, $$entity) {
+        return 0;
+    }
     const internal_reg = (): any => {
-        const itemInstance: any = new nmi_OvenItem().$setUnlocalizedName(
+        var itemInstance: any = new nmi_OvenItem().$setUnlocalizedName(
             ModAPI.util.str(`${itemID}`)
         );
 
@@ -96,35 +119,35 @@ export function registerServerBlock(blockID: string, onBreak: ($world: any, $blo
     };
     function fixupBlockIds() {
         const blockRegistry = ModAPI.util
-          .wrap(
-            ModAPI.reflect.getClassById("net.minecraft.block.Block").staticVariables
-              .blockRegistry
-          )
-          .getCorrective();
-    
+            .wrap(
+                ModAPI.reflect.getClassById("net.minecraft.block.Block").staticVariables
+                    .blockRegistry
+            )
+            .getCorrective();
+
         const BLOCK_STATE_IDS = ModAPI.util
-          .wrap(
-            ModAPI.reflect.getClassById("net.minecraft.block.Block").staticVariables
-              .BLOCK_STATE_IDS
-          )
-          .getCorrective();
-    
+            .wrap(
+                ModAPI.reflect.getClassById("net.minecraft.block.Block").staticVariables
+                    .BLOCK_STATE_IDS
+            )
+            .getCorrective();
+
         blockRegistry.registryObjects.hashTableKToV.forEach(
-          (entry: { value: any }) => {
-            if (entry) {
-              const block = entry.value;
-              const validStates = block.getBlockState().getValidStates();
-              const stateArray = validStates.array || [validStates.element];
-              stateArray.forEach((iblockstate: any) => {
-                const i =
-                  (blockRegistry.getIDForObject(block.getRef()) << 4) |
-                  block.getMetaFromState(iblockstate.getRef());
-                BLOCK_STATE_IDS.put(iblockstate.getRef(), i);
-              });
+            (entry: { value: any }) => {
+                if (entry) {
+                    const block = entry.value;
+                    const validStates = block.getBlockState().getValidStates();
+                    const stateArray = validStates.array || [validStates.element];
+                    stateArray.forEach((iblockstate: any) => {
+                        const i =
+                            (blockRegistry.getIDForObject(block.getRef()) << 4) |
+                            block.getMetaFromState(iblockstate.getRef());
+                        BLOCK_STATE_IDS.put(iblockstate.getRef(), i);
+                    });
+                }
             }
-          }
         );
-      }
+    }
     const internalRegister = (): any => {
         const custom_block = new CustomBlock()
             .$setHardness(3.0)
@@ -141,7 +164,7 @@ export function registerServerBlock(blockID: string, onBreak: ($world: any, $blo
 
         fixupBlockIds();
         ModAPI.blocks[blockID] = custom_block;
-        console.log("Registering block");
+        console.log("Registering block on server side");
         console.log(custom_block);
         return custom_block;
     };
