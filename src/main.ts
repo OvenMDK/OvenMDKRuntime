@@ -3,7 +3,7 @@
   Oven Mod Development Kit (OvenMDK) Runtime
   Dev kit used for simplifying EaglerForge mod development.
 	
-  Copyright 2025 Block_2222
+  Copyright 2025 BendieGames and Block_2222
     Licenced under GNU LGPL-3.0-or-later
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -25,11 +25,11 @@
 import icon from "ASSETS/defaultIcon.png";
 
 ModAPI.meta.title("OvenMDK Runtime");
-ModAPI.meta.version("INDEV");
+ModAPI.meta.version("Alpha v0.1");
 ModAPI.meta.description(
   "Unofficial dev kit used for simplifying EaglerForge mod development."
 );
-ModAPI.meta.credits("Block_2222");
+ModAPI.meta.credits("BendieGames and Block_2222");
 ModAPI.meta.icon(icon);
 import { registerServerItem, registerServerBlock } from "classes/core/Helper_func";
 import OItem from "classes/core/OItem";

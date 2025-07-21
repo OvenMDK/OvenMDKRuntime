@@ -2,7 +2,7 @@
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	Mod.ts
 	
-	Copyright 2025 Block_2222
+	Copyright 2025 BendieGames and Block_2222
     Licenced under GNU LGPL-3.0-or-later
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 

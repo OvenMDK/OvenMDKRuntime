@@ -2,7 +2,7 @@
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 	Oven.ts
 	
-	Copyright 2025 Block_2222
+	Copyright 2025 BendieGames and Block_2222
     Licenced under GNU LGPL-3.0-or-later
 	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -35,9 +35,9 @@ export default class Oven {
     ModAPI.meta.config(modClass.config());
     modClass.init();
     globalThis.Debug_mode = modClass.Debug_mode;
-    if (modClass.only_1_12_2 === true) {
+    /*if (modClass.only_1_12_2 === true) {
       // Ill do some more stuff later
-    }
+    }*/
     this.mods.push(modClass);
   }
 }
