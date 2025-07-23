@@ -1,10 +1,10 @@
 /*
-	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	OItem.ts
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  OItem.ts
 	
-	Copyright 2025 BendieGames and Block_2222
+  Copyright 2025 BendieGames and Block_2222
     Licenced under GNU LGPL-3.0-or-later
-	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     This file is part of OvenMDK.
 
@@ -43,20 +43,19 @@ export default class OItem {
   }
 
   public registerClient(): void {
-    
+
     var $$itemGetAttributes = ModAPI.reflect.getClassById("net.minecraft.item.Item").methods.getItemAttributeModifiers.method;
     let creativeMiscTab: any;
-    if (!ModAPI.is_1_12) {
-      const creativeMiscTab: any = ModAPI.reflect.getClassById(
+    if (ModAPI.is_1_12) {
+      creativeMiscTab = ModAPI.reflect.getClassById(
+        "net.minecraft.creativetab.CreativeTabs"
+      ).staticVariables.MISC;
+    } else {
+      creativeMiscTab = ModAPI.reflect.getClassById(
         "net.minecraft.creativetab.CreativeTabs"
       ).staticVariables.tabMisc;
     }
-    if (ModAPI.is_1_12) {
-      const creativeMiscTab: any = ModAPI.reflect.getClassById(
-        "net.minecraft.creativetab.CreativeTabs"
-      ).staticVariables.MISC;
-    }
-    
+
     const itemClass: any = ModAPI.reflect.getClassById(
       "net.minecraft.item.Item"
     );
@@ -73,18 +72,34 @@ export default class OItem {
     }
 
     ModAPI.reflect.prototypeStack(itemClass, nmi_OvenItem);
-    nmi_OvenItem.prototype.$onItemRightClick = function (
-      $$itemstack: any,
-      $$world: any,
-      $$player: any
-    ): void {
-      self.onRightClick($$itemstack);
-      ($$player).$setItemInUse($$itemstack,32);
-      var $$itemstack,$$world,$$player;
-      console.log(`client itemstack:`);
-      console.log($$itemstack);
-      return ($$itemstack);
+    if (!ModAPI.is_1_12) {
+      nmi_OvenItem.prototype.$onItemRightClick = function (
+        $$itemstack: any,
+        $$world: any,
+        $$player: any
+      ): void {
+        if (!ModAPI.is_1_12) ($$player).$setItemInUse($$itemstack, 32);
+        var $$itemstack, $$world, $$player;
+        //onRightClick($$itemstack);
+        console.log(`server itemstack:`);
+        console.log($$itemstack);
+        return ($$itemstack);
+      }
     };
+    if (ModAPI.is_1_12) {
+      var $$ResultEnum = ModAPI.reflect.getClassByName("EnumActionResult").staticVariables;
+      var $$ActionResult = ModAPI.reflect.getClassByName("ActionResult").constructors[0];
+      nmi_OvenItem.prototype.$onItemRightClick = function ($$world, $$player, $handEnum, $unused) {
+        var $$itemstack = ($$player).$getHeldItem($handEnum);
+
+        ($$player).$setActiveHand($handEnum);
+
+        var $$itemstack, $$world, $$player;
+        self.onRightClick($$itemstack);
+        console.log($$itemstack);
+        return ($$ActionResult($$ResultEnum.SUCCESS, $$itemstack));
+      }
+    }
     nmi_OvenItem.prototype.$onUpdate = function ($$itemstack, $$world, $$player, $$hotbar_slot, $$is_held) {
       $$is_held = ($$is_held) ? true : false;
       return ($$itemstack);
@@ -133,7 +148,6 @@ export default class OItem {
       ModAPI.addEventListener("bootstrap", internal_reg);
     }
   }
-
   public async registerItem(): Promise<void> {
 
     const self = this;
@@ -152,22 +166,32 @@ export default class OItem {
       AsyncSink.setFile(
         `resourcepacks/AsyncSinkLib/assets/minecraft/models/item/${self.itemID}.json`,
         JSON.stringify({
-          parent: "builtin/generated",
-          textures: {
-            layer0: `items/${self.itemID}`,
+          "parent": "builtin/generated",
+          "textures": {
+            "layer0": `items/${self.itemID}`,
           },
-          display: {
-            thirdperson: {
-              rotation: [-90, 0, 0],
-              translation: [0, 1, -3],
-              scale: [0.55, 0.55, 0.55],
+          "display": {
+            "thirdperson_righthand": {
+              "rotation": [0, -90, 55],
+              "translation": [0, 4, 0.5],
+              "scale": [0.85, 0.85, 0.85]
             },
-            firstperson: {
-              rotation: [0, -135, 25],
-              translation: [0, 4, 2],
-              scale: [1.7, 1.7, 1.7],
+            "thirdperson_lefthand": {
+              "rotation": [0, 90, -55],
+              "translation": [0, 4, 0.5],
+              "scale": [0.85, 0.85, 0.85]
             },
-          },
+            "firstperson_righthand": {
+              "rotation": [0, -90, 25],
+              "translation": [1.13, 3.2, 1.13],
+              "scale": [0.68, 0.68, 0.68]
+            },
+            "firstperson_lefthand": {
+              "rotation": [0, 90, -25],
+              "translation": [1.13, 3.2, 1.13],
+              "scale": [0.68, 0.68, 0.68]
+            }
+          }
         })
       );
 

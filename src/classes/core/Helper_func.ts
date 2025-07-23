@@ -25,17 +25,18 @@ export function registerServerItem(itemID: string, itemStack: number, onRightCli
         console.log("registerServerItem can only be used on the server side.");
         return;
     }*/
+
     let creativeMiscTab: any;
-    if (!ModAPI.is_1_12) {
-        const creativeMiscTab: any = ModAPI.reflect.getClassById(
+    if (ModAPI.is_1_12) {
+        creativeMiscTab = ModAPI.reflect.getClassById(
+            "net.minecraft.creativetab.CreativeTabs"
+        ).staticVariables.MISC;
+    } else {
+        creativeMiscTab = ModAPI.reflect.getClassById(
             "net.minecraft.creativetab.CreativeTabs"
         ).staticVariables.tabMisc;
     }
-    if (ModAPI.is_1_12) {
-        const creativeMiscTab: any = ModAPI.reflect.getClassById(
-            "net.minecraft.creativetab.CreativeTabs"
-        ).staticVariables.MISC;
-    }
+
     const $$itemGetAttributes = ModAPI.reflect.getClassById("net.minecraft.item.Item").methods.getItemAttributeModifiers.method;
     const itemClass: any = ModAPI.reflect.getClassById(
         "net.minecraft.item.Item"
@@ -57,18 +58,35 @@ export function registerServerItem(itemID: string, itemStack: number, onRightCli
 
     ModAPI.reflect.prototypeStack(itemClass, nmi_OvenItem);
 
-    nmi_OvenItem.prototype.$onItemRightClick = function (
-        $$itemstack: any,
-        $$world: any,
-        $$player: any
-    ): void {
-        ($$player).$setItemInUse($$itemstack, 32);
-        var $$itemstack, $$world, $$player;
-        //onRightClick($$itemstack);
-        console.log(`server itemstack:`);
-        console.log($$itemstack);
-        return ($$itemstack);
+    if (!ModAPI.is_1_12) {
+        nmi_OvenItem.prototype.$onItemRightClick = function (
+            $$itemstack: any,
+            $$world: any,
+            $$player: any
+        ): void {
+            if (!ModAPI.is_1_12) ($$player).$setItemInUse($$itemstack, 32);
+            var $$itemstack, $$world, $$player;
+            //onRightClick($$itemstack);
+            console.log(`server itemstack:`);
+            console.log($$itemstack);
+            return ($$itemstack);
+        }
     };
+    if (ModAPI.is_1_12) {
+        var $$ResultEnum = ModAPI.reflect.getClassByName("EnumActionResult").staticVariables;
+        var $$ActionResult = ModAPI.reflect.getClassByName("ActionResult").constructors[0];
+        nmi_OvenItem.prototype.$onItemRightClick = function ($$world, $$player, $handEnum, $unused) {
+            var $$itemstack = ($$player).$getHeldItem($handEnum);
+
+            ($$player).$setActiveHand($handEnum);
+
+            var $$itemstack, $$world, $$player;
+            //onRightClick($$itemstack);
+            console.log($$itemstack);
+            return ($$ActionResult($$ResultEnum.SUCCESS, $$itemstack));
+        }
+    }
+
     nmi_OvenItem.prototype.$onUpdate = function ($$itemstack, $$world, $$player, $$hotbar_slot, $$is_held) {
         $$is_held = ($$is_held) ? true : false;
         return ($$itemstack);
