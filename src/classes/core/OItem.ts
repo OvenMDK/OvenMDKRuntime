@@ -163,37 +163,34 @@ export default class OItem {
 
       AsyncSink.L10N.set(`item.${self.itemID}.name`, self.itemName);
 
-      AsyncSink.setFile(
-        `resourcepacks/AsyncSinkLib/assets/minecraft/models/item/${self.itemID}.json`,
-        JSON.stringify({
-          "parent": "builtin/generated",
-          "textures": {
-            "layer0": `items/${self.itemID}`,
+      AsyncSink.setFile(`resourcepacks/AsyncSinkLib/assets/minecraft/models/item/${self.itemID}.json`, JSON.stringify({
+        "parent": "builtin/generated",
+        "textures": {
+          "layer0": `items/${self.itemID}`
+        },
+        "display": {
+          "thirdperson_righthand": {
+            "rotation": [0, -90, 55],
+            "translation": [0, 4, 0.5],
+            "scale": [0.85, 0.85, 0.85]
           },
-          "display": {
-            "thirdperson_righthand": {
-              "rotation": [0, -90, 55],
-              "translation": [0, 4, 0.5],
-              "scale": [0.85, 0.85, 0.85]
-            },
-            "thirdperson_lefthand": {
-              "rotation": [0, 90, -55],
-              "translation": [0, 4, 0.5],
-              "scale": [0.85, 0.85, 0.85]
-            },
-            "firstperson_righthand": {
-              "rotation": [0, -90, 25],
-              "translation": [1.13, 3.2, 1.13],
-              "scale": [0.68, 0.68, 0.68]
-            },
-            "firstperson_lefthand": {
-              "rotation": [0, 90, -25],
-              "translation": [1.13, 3.2, 1.13],
-              "scale": [0.68, 0.68, 0.68]
-            }
+          "thirdperson_lefthand": {
+            "rotation": [0, 90, -55],
+            "translation": [0, 4, 0.5],
+            "scale": [0.85, 0.85, 0.85]
+          },
+          "firstperson_righthand": {
+            "rotation": [0, -90, 25],
+            "translation": [1.13, 3.2, 1.13],
+            "scale": [0.68, 0.68, 0.68]
+          },
+          "firstperson_lefthand": {
+            "rotation": [0, 90, -25],
+            "translation": [1.13, 3.2, 1.13],
+            "scale": [0.68, 0.68, 0.68]
           }
-        })
-      );
+        }
+      }));
 
       const response = await fetch(self.itemTexture);
       const buffer = await response.arrayBuffer();

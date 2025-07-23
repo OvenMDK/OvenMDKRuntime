@@ -111,7 +111,7 @@ export function registerServerItem(itemID: string, itemStack: number, onRightCli
         return 0;
     }
     const internal_reg = (): any => {
-        var itemInstance: any = new nmi_OvenItem().$setUnlocalizedName(
+        var itemInstance: any = (new nmi_OvenItem()).$setUnlocalizedName(
             ModAPI.util.str(`${itemID}`)
         );
 

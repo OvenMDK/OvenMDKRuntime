@@ -33,6 +33,6 @@ module.exports = {
   },
   optimization: {
     mangleExports: 'deterministic',
-    minimize: true,
+    minimize: false,
   }
 };
