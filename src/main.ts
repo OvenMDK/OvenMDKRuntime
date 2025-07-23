@@ -27,7 +27,7 @@ import icon from "ASSETS/defaultIcon.png";
 ModAPI.meta.title("OvenMDK Runtime");
 ModAPI.meta.version("Alpha v0.1");
 ModAPI.meta.description(
-  "Unofficial dev kit used for simplifying EaglerForge mod development."
+    "Unofficial dev kit used for simplifying EaglerForge mod development."
 );
 ModAPI.meta.credits("BendieGames and Block_2222");
 ModAPI.meta.icon(icon);
@@ -37,13 +37,36 @@ import OMod from "classes/core/Mod";
 import Oven from "classes/core/Oven";
 import OBlock from "classes/core/OBlock";
 
-globalThis.registerServerItem = registerServerItem;
-globalThis.registerServerBlock = registerServerBlock;
-globalThis.OItem = OItem;
-globalThis.OMod = OMod;
-globalThis.OvenMDK = Oven;
-globalThis.OBlock = OBlock;
-//globalThis.isServerSide = isServerSide;
-ModAPI.dedicatedServer.appendCode(`globalThis.registerServerItem = ${registerServerItem};`);
-ModAPI.dedicatedServer.appendCode(`globalThis.registerServerBlock = ${registerServerBlock};`);
-console.log("OvenMDK Runtime initialized");
+ModAPI.events.newEvent("lib:OvenMDK:load");
+ModAPI.events.newEvent("lib:OvenMDK:loaded");
+ModAPI.addEventListener("lib:OvenMDK:load", () => {
+    console.log("OvenMDK Runtime is loading");
+    globalThis.registerServerItem = registerServerItem;
+    globalThis.registerServerBlock = registerServerBlock;
+    globalThis.OItem = OItem;
+    globalThis.OMod = OMod;
+    globalThis.OvenMDK = Oven;
+    globalThis.OBlock = OBlock;
+    console.log("OvenMDK globals have been set and loaded");
+    ModAPI.dedicatedServer.appendCode(`globalThis.registerServerItem = ${registerServerItem};`);
+    console.log("Register Item serverside function loaded");
+    ModAPI.dedicatedServer.appendCode(`globalThis.registerServerBlock = ${registerServerBlock};`);
+    console.log("Register Block serverside function loaded");
+    ModAPI.events.callEvent("lib:OvenMDK:loaded", {});
+});
+ModAPI.addEventListener("lib:OvenMDK:loaded", () => {
+    console.log("OvenMDK Runtime has finished loading");
+    console.log(`
+    ┌───────────────────────────────────┐
+    │                                   │
+    │   OvenMDK has loaded              │
+    │                                   │
+    │   welcome to ovenMDK              │
+    │                                   │
+    │   A mod maker kit for starters    │
+    │                                   │
+    └───────────────────────────────────┘
+    `);
+});
+
+ModAPI.events.callEvent("lib:OvenMDK:load", {});
