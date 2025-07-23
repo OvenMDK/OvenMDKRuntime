@@ -141,11 +141,17 @@ export function registerServerBlock(blockID: string, onBreak: ($world: any, $blo
     }*/
     const BlockClass = ModAPI.reflect.getClassById("net.minecraft.block.Block");
     const ItemClass = ModAPI.reflect.getClassById("net.minecraft.item.Item");
-
-    const creativeTab = ModAPI.reflect.getClassById(
-        "net.minecraft.creativetab.CreativeTabs"
-    ).staticVariables.tabBlock;
-
+    let creativeTab: any;
+    if (ModAPI.is_1_12) {
+        creativeTab = ModAPI.reflect.getClassById(
+            "net.minecraft.creativetab.CreativeTabs"
+        ).staticVariables.BUILDING_BLOCKS;
+    }
+    if (!ModAPI.is_1_12) {
+        creativeTab = ModAPI.reflect.getClassById(
+            "net.minecraft.creativetab.CreativeTabs"
+        ).staticVariables.tabBlock;
+    }
     const blockSuper = ModAPI.reflect.getSuper(
         BlockClass,
         (fn: Function) => fn.length === 2
@@ -206,16 +212,16 @@ export function registerServerBlock(blockID: string, onBreak: ($world: any, $blo
     const internalRegister = (): any => {
         let custom_block: any;
         if (!ModAPI.is_1_12) {
-            const custom_block = new CustomBlock()
+            custom_block = new CustomBlock()
                 .$setHardness(3.0)
                 .$setStepSound(BlockClass.staticVariables.soundTypePiston)
-                .$setUnlocalizedName(ModAPI.util.str(this.blockID));
+                .$setUnlocalizedName(ModAPI.util.str(blockID));
         }
         if (ModAPI.is_1_12) {
-            const custom_block = new CustomBlock()
+            custom_block = new CustomBlock()
                 .$setHardness(3.0)
                 .$setSoundType(ModAPI.blockSounds.PLANT.getRef())
-                .$setUnlocalizedName(ModAPI.util.str(this.blockID));
+                .$setUnlocalizedName(ModAPI.util.str(blockID));
         }
         BlockClass.staticMethods.registerBlock0.method(
             ModAPI.keygen.block(blockID),

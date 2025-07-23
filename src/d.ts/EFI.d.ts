@@ -78,7 +78,20 @@ declare namespace ModAPI {
      * @see {@link https://eaglerforge.github.io/EaglerForgeInjector/docs/apidoc/events.html} Events Documentation
     */
     function addEventListener(eventName: string, callback: Function): void;
-
+    namespace blockSounds {
+        let WOOD: any;
+        let GRAVEL: any;
+        let STONE: any;
+        let METAL: any;
+        let GLASS: any;
+        let CLOTH: any;
+        let SAND: any;
+        let PLANT: any;
+        let SNOW: any;
+        let LADDER: any;
+        let ANVIL: any;
+        let SLIME: any;
+    }
     /**
      * This module is used to interact and create arrays easily.
      * @see {@link https://eaglerforge.github.io/EaglerForgeInjector/docs/apidoc/array.html} Array Documentation

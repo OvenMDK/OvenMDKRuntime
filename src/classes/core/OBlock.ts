@@ -76,13 +76,13 @@ export default class OBlock {
     const internalRegister = (): any => {
       let custom_block: any;
       if (!ModAPI.is_1_12) {
-        const custom_block = new CustomBlock()
+        custom_block = new CustomBlock()
           .$setHardness(3.0)
           .$setStepSound(BlockClass.staticVariables.soundTypePiston)
           .$setUnlocalizedName(ModAPI.util.str(this.blockID));
       }
       if (ModAPI.is_1_12) {
-        const custom_block = new CustomBlock()
+        custom_block = new CustomBlock()
           .$setHardness(3.0)
           .$setSoundType(ModAPI.blockSounds.PLANT.getRef())
           .$setUnlocalizedName(ModAPI.util.str(this.blockID));
