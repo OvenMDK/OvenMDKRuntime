@@ -65,7 +65,7 @@ declare namespace ModAPI {
      * @see {@link https://github.com/eaglerforge}
      */
     function addCredit(category: string, contributor: string, contents: string): void;
-
+    let is_1_12: boolean;
     /**
      * Used to register an event handler.
      * @example

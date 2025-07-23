@@ -43,11 +43,20 @@ export default class OItem {
   }
 
   public registerClient(): void {
+    
     var $$itemGetAttributes = ModAPI.reflect.getClassById("net.minecraft.item.Item").methods.getItemAttributeModifiers.method;
-    const creativeMiscTab: any = ModAPI.reflect.getClassById(
-      "net.minecraft.creativetab.CreativeTabs"
-    ).staticVariables.tabMisc;
-
+    let creativeMiscTab: any;
+    if (!ModAPI.is_1_12) {
+      const creativeMiscTab: any = ModAPI.reflect.getClassById(
+        "net.minecraft.creativetab.CreativeTabs"
+      ).staticVariables.tabMisc;
+    }
+    if (ModAPI.is_1_12) {
+      const creativeMiscTab: any = ModAPI.reflect.getClassById(
+        "net.minecraft.creativetab.CreativeTabs"
+      ).staticVariables.MISC;
+    }
+    
     const itemClass: any = ModAPI.reflect.getClassById(
       "net.minecraft.item.Item"
     );

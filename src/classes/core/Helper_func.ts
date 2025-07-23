@@ -1,10 +1,10 @@
 /*
-	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	Helper_func.ts
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Helper_func.ts
 	
-	Copyright 2025 BendieGames and Block_2222
+    Copyright 2025 BendieGames and Block_2222
     Licenced under GNU LGPL-3.0-or-later
-	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     This file is part of OvenMDK.
 
@@ -25,9 +25,17 @@ export function registerServerItem(itemID: string, itemStack: number, onRightCli
         console.log("registerServerItem can only be used on the server side.");
         return;
     }*/
-    const creativeMiscTab: any = ModAPI.reflect.getClassById(
-        "net.minecraft.creativetab.CreativeTabs"
-    ).staticVariables.tabMisc;
+    let creativeMiscTab: any;
+    if (!ModAPI.is_1_12) {
+        const creativeMiscTab: any = ModAPI.reflect.getClassById(
+            "net.minecraft.creativetab.CreativeTabs"
+        ).staticVariables.tabMisc;
+    }
+    if (ModAPI.is_1_12) {
+        const creativeMiscTab: any = ModAPI.reflect.getClassById(
+            "net.minecraft.creativetab.CreativeTabs"
+        ).staticVariables.MISC;
+    }
     const $$itemGetAttributes = ModAPI.reflect.getClassById("net.minecraft.item.Item").methods.getItemAttributeModifiers.method;
     const itemClass: any = ModAPI.reflect.getClassById(
         "net.minecraft.item.Item"
@@ -54,8 +62,8 @@ export function registerServerItem(itemID: string, itemStack: number, onRightCli
         $$world: any,
         $$player: any
     ): void {
-        ($$player).$setItemInUse($$itemstack,32);
-        var $$itemstack,$$world,$$player;
+        ($$player).$setItemInUse($$itemstack, 32);
+        var $$itemstack, $$world, $$player;
         //onRightClick($$itemstack);
         console.log(`server itemstack:`);
         console.log($$itemstack);
@@ -130,7 +138,9 @@ export function registerServerBlock(blockID: string, onBreak: ($world: any, $blo
 
     function CustomBlock(this: any): void {
         blockSuper(this, ModAPI.materials.rock.getRef());
-        this.$defaultBlockState = this.$blockState.$getBaseState();
+        if (!ModAPI.is_1_12) {
+            this.$defaultBlockState = this.$blockState.$getBaseState();
+        }
         this.$setCreativeTab(creativeTab);
     }
 
@@ -176,11 +186,19 @@ export function registerServerBlock(blockID: string, onBreak: ($world: any, $blo
         );
     }
     const internalRegister = (): any => {
-        const custom_block = new CustomBlock()
-            .$setHardness(3.0)
-            .$setStepSound(BlockClass.staticVariables.soundTypePiston)
-            .$setUnlocalizedName(ModAPI.util.str(blockID));
-
+        let custom_block: any;
+        if (!ModAPI.is_1_12) {
+            const custom_block = new CustomBlock()
+                .$setHardness(3.0)
+                .$setStepSound(BlockClass.staticVariables.soundTypePiston)
+                .$setUnlocalizedName(ModAPI.util.str(this.blockID));
+        }
+        if (ModAPI.is_1_12) {
+            const custom_block = new CustomBlock()
+                .$setHardness(3.0)
+                .$setSoundType(ModAPI.blockSounds.PLANT.getRef())
+                .$setUnlocalizedName(ModAPI.util.str(this.blockID));
+        }
         BlockClass.staticMethods.registerBlock0.method(
             ModAPI.keygen.block(blockID),
             ModAPI.util.str(blockID),

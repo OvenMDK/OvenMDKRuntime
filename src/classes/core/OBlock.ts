@@ -1,10 +1,10 @@
 /*
-	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-	OBlock.ts
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  OBlock.ts
 	
-	Copyright 2025 BendieGames and Block_2222
+  Copyright 2025 BendieGames and Block_2222
     Licenced under GNU LGPL-3.0-or-later
-	~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
     This file is part of OvenMDK.
 
@@ -56,7 +56,9 @@ export default class OBlock {
 
     function CustomBlock(this: any): void {
       blockSuper(this, ModAPI.materials.rock.getRef());
-      this.$defaultBlockState = this.$blockState.$getBaseState();
+      if (!ModAPI.is_1_12) {
+        this.$defaultBlockState = this.$blockState.$getBaseState();
+      }
       this.$setCreativeTab(creativeTab);
     }
 
@@ -72,11 +74,19 @@ export default class OBlock {
     };
 
     const internalRegister = (): any => {
-      const custom_block = new CustomBlock()
-        .$setHardness(3.0)
-        .$setStepSound(BlockClass.staticVariables.soundTypePiston)
-        .$setUnlocalizedName(ModAPI.util.str(this.blockID));
-
+      let custom_block: any;
+      if (!ModAPI.is_1_12) {
+        const custom_block = new CustomBlock()
+          .$setHardness(3.0)
+          .$setStepSound(BlockClass.staticVariables.soundTypePiston)
+          .$setUnlocalizedName(ModAPI.util.str(this.blockID));
+      }
+      if (ModAPI.is_1_12) {
+        const custom_block = new CustomBlock()
+          .$setHardness(3.0)
+          .$setSoundType(ModAPI.blockSounds.PLANT.getRef())
+          .$setUnlocalizedName(ModAPI.util.str(this.blockID));
+      }
       BlockClass.staticMethods.registerBlock0.method(
         ModAPI.keygen.block(this.blockID),
         ModAPI.util.str(this.blockID),
