@@ -80,7 +80,7 @@ export default class OItem {
       ): void {
         if (!ModAPI.is_1_12) ($$player).$setItemInUse($$itemstack, 32);
         var $$itemstack, $$world, $$player;
-        //onRightClick($$itemstack);
+        self.onRightClick($$itemstack);
         console.log(`server itemstack:`);
         console.log($$itemstack);
         return ($$itemstack);
