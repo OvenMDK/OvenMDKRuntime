@@ -153,52 +153,83 @@ export default class OItem {
     const self = this;
     var custom_item = new OItem(this.itemName, this.itemID, this.itemStack, this.itemTexture, this.onRightClick).registerClient();
     ModAPI.dedicatedServer.appendCode(`globalThis.registerServerItem("${this.itemID}", ${this.itemStack}, ${this.onRightClick});`);
-    ModAPI.addEventListener("lib:asyncsink", async () => {
-      ModAPI.addEventListener(
-        "lib:asyncsink:registeritems",
-        (renderItem: any) => {
-          renderItem.registerItem(custom_item, ModAPI.util.str(self.itemID));
-        }
-      );
-
-      AsyncSink.L10N.set(`item.${self.itemID}.name`, self.itemName);
-
-      AsyncSink.setFile(`resourcepacks/AsyncSinkLib/assets/minecraft/models/item/${self.itemID}.json`, JSON.stringify({
-        "parent": "builtin/generated",
-        "textures": {
-          "layer0": `items/${self.itemID}`
-        },
-        "display": {
-          "thirdperson_righthand": {
-            "rotation": [0, -90, 55],
-            "translation": [0, 4, 0.5],
-            "scale": [0.85, 0.85, 0.85]
-          },
-          "thirdperson_lefthand": {
-            "rotation": [0, 90, -55],
-            "translation": [0, 4, 0.5],
-            "scale": [0.85, 0.85, 0.85]
-          },
-          "firstperson_righthand": {
-            "rotation": [0, -90, 25],
-            "translation": [1.13, 3.2, 1.13],
-            "scale": [0.68, 0.68, 0.68]
-          },
-          "firstperson_lefthand": {
-            "rotation": [0, 90, -25],
-            "translation": [1.13, 3.2, 1.13],
-            "scale": [0.68, 0.68, 0.68]
+    if (ModAPI.is_1_12) {
+      ModAPI.addEventListener("lib:asyncsink", async () => {
+        ModAPI.addEventListener(
+          "lib:asyncsink:registeritems",
+          (renderItem: any) => {
+            renderItem.registerItem(custom_item, ModAPI.util.str(`${self.itemID}`));
           }
-        }
-      }));
+        );
 
-      const response = await fetch(self.itemTexture);
-      const buffer = await response.arrayBuffer();
+        AsyncSink.L10N.set(`item.${self.itemID}.name`, `${self.itemName}`);
 
-      AsyncSink.setFile(
-        `resourcepacks/AsyncSinkLib/assets/minecraft/textures/items/${self.itemID}.png`,
-        buffer
-      );
-    });
+        AsyncSink.setFile(`resourcepacks/AsyncSinkLib/assets/minecraft/models/item/${self.itemID}.json`, JSON.stringify(
+          {
+            "parent": "item/generated",
+            "textures": {
+              "layer0": `items/${this.itemID}`
+            }
+          }
+        ));
+
+        const response = await fetch(self.itemTexture);
+        const buffer = await response.arrayBuffer();
+
+        AsyncSink.setFile(
+          "resourcepacks/AsyncSinkLib/assets/minecraft/textures/items/" + self.itemID + ".png",
+          buffer
+        );
+      });
+    }
+    if (!ModAPI.is_1_12) {
+      ModAPI.addEventListener("lib:asyncsink", async () => {
+        ModAPI.addEventListener(
+          "lib:asyncsink:registeritems",
+          (renderItem: any) => {
+            renderItem.registerItem(custom_item, ModAPI.util.str(self.itemID));
+          }
+        );
+
+        AsyncSink.L10N.set(`item.${self.itemID}.name`, self.itemName);
+
+        AsyncSink.setFile(`resourcepacks/AsyncSinkLib/assets/minecraft/models/item/${self.itemID}.json`, JSON.stringify({
+          "parent": "builtin/generated",
+          "textures": {
+            "layer0": `items/${self.itemID}`
+          },
+          "display": {
+            "thirdperson_righthand": {
+              "rotation": [0, -90, 55],
+              "translation": [0, 4, 0.5],
+              "scale": [0.85, 0.85, 0.85]
+            },
+            "thirdperson_lefthand": {
+              "rotation": [0, 90, -55],
+              "translation": [0, 4, 0.5],
+              "scale": [0.85, 0.85, 0.85]
+            },
+            "firstperson_righthand": {
+              "rotation": [0, -90, 25],
+              "translation": [1.13, 3.2, 1.13],
+              "scale": [0.68, 0.68, 0.68]
+            },
+            "firstperson_lefthand": {
+              "rotation": [0, 90, -25],
+              "translation": [1.13, 3.2, 1.13],
+              "scale": [0.68, 0.68, 0.68]
+            }
+          }
+        }));
+
+        const response = await fetch(self.itemTexture);
+        const buffer = await response.arrayBuffer();
+
+        AsyncSink.setFile(
+          `resourcepacks/AsyncSinkLib/assets/minecraft/textures/items/${self.itemID}.png`,
+          buffer
+        );
+      });
+    }
   }
 }

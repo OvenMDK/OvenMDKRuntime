@@ -1,7 +1,7 @@
 /*
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
   OBlock.ts
-	
+
   Copyright 2025 BendieGames and Block_2222
     Licenced under GNU LGPL-3.0-or-later
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -10,14 +10,14 @@
 
     OvenMDK is free software: you can redistribute it and/or modify it under
     the terms of the GNU Lesser General Public License as published by the Free
-    Software Foundation, either version 3 of the License, or (at your option) 
+    Software Foundation, either version 3 of the License, or (at your option)
     any later version.
 
-    OvenMDK is distributed in the hope that it will be useful, but WITHOUT ANY 
-    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS 
+    OvenMDK is distributed in the hope that it will be useful, but WITHOUT ANY
+    WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
     FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
 
-    You should have received a copy of the GNU Lesser General Public License along 
+    You should have received a copy of the GNU Lesser General Public License along
     with Oven MDK. If not, see <https://www.gnu.org/licenses/>.
 */
 export default class OBlock {
@@ -41,11 +41,17 @@ export default class OBlock {
   public register(): any {
     const BlockClass = ModAPI.reflect.getClassById("net.minecraft.block.Block");
     const ItemClass = ModAPI.reflect.getClassById("net.minecraft.item.Item");
-
-    const creativeTab = ModAPI.reflect.getClassById(
-      "net.minecraft.creativetab.CreativeTabs"
-    ).staticVariables.tabBlock;
-
+    let creativeTab: any;
+    if (!ModAPI.is_1_12) {
+      creativeTab = ModAPI.reflect.getClassById(
+        "net.minecraft.creativetab.CreativeTabs"
+      ).staticVariables.tabBlock;
+    }
+    if (ModAPI.is_1_12) {
+      creativeTab = ModAPI.reflect.getClassById(
+        "net.minecraft.creativetab.CreativeTabs"
+      ).staticVariables.BUILDING_BLOCKS;
+    }
     const blockSuper = ModAPI.reflect.getSuper(
       BlockClass,
       (fn: Function) => fn.length === 2
@@ -54,7 +60,7 @@ export default class OBlock {
 
     const self = this;
 
-    function CustomBlock(this: any): void {
+    function nmb_Oblock(this: any): void {
       blockSuper(this, ModAPI.materials.rock.getRef());
       if (!ModAPI.is_1_12) {
         this.$defaultBlockState = this.$blockState.$getBaseState();
@@ -62,28 +68,32 @@ export default class OBlock {
       this.$setCreativeTab(creativeTab);
     }
 
-    ModAPI.reflect.prototypeStack(BlockClass, CustomBlock);
+    ModAPI.reflect.prototypeStack(BlockClass, nmb_Oblock);
 
-    CustomBlock.prototype.$breakBlock = function (
+    nmb_Oblock.prototype.$breakBlock = function (
       $world: any,
       $blockpos: any,
       $blockstate: any
     ): boolean {
-      self.onBreak($world, $blockpos, $blockstate);
       return breakBlockMethod(this, $world, $blockpos, $blockstate);
     };
-
+    var $$onBlockDestroyedByPlayerMethod = BlockClass.methods.onBlockDestroyedByPlayer.method;
+    nmb_Oblock.prototype.$onBlockDestroyedByPlayer = function ($$world, $$blockpos, $$blockstate) {
+      var $$world,$$blockpos,$$blockstate;
+      this.onBreak($$world, $$blockpos, $$blockstate)
+      return $$onBlockDestroyedByPlayerMethod(this, $$world, $$blockpos, $$blockstate);
+    }
     const internalRegister = (): any => {
       let custom_block: any;
       if (!ModAPI.is_1_12) {
-        custom_block = new CustomBlock()
+        custom_block = new nmb_Oblock()
           .$setHardness(3.0)
           .$setStepSound(BlockClass.staticVariables.soundTypePiston)
           .$setUnlocalizedName(ModAPI.util.str(this.blockID));
       }
       if (ModAPI.is_1_12) {
-        custom_block = new CustomBlock()
-          .$setHardness(3.0)
+        custom_block = new nmb_Oblock()
+          .$setHardness(-1.0)
           .$setSoundType(ModAPI.blockSounds.PLANT.getRef())
           .$setUnlocalizedName(ModAPI.util.str(this.blockID));
       }
@@ -102,15 +112,21 @@ export default class OBlock {
       console.log(custom_block);
       return custom_block;
     };
-
-    if (ModAPI.materials) {
-      return internalRegister();
-    } else {
-      ModAPI.addEventListener("bootstrap", internalRegister);
+    if (!ModAPI.is_1_12) {
+      if (ModAPI.materials) {
+        return internalRegister();
+      } else {
+        ModAPI.addEventListener("bootstrap", internalRegister);
+      }
+    }
+    if (ModAPI.is_1_12) {
+      if (ModAPI.blocks) {
+        return ((new nmb_Oblock()).$setHardness(-1.0).$setSoundType(ModAPI.blockSounds.PLANT.getRef()).$setUnlocalizedName(ModAPI.util.str(this.blockID)));
+      }
     }
   }
 
-  private fixupBlockIds(): void {
+  public fixupBlockIds(): any {
     const blockRegistry = ModAPI.util
       .wrap(
         ModAPI.reflect.getClassById("net.minecraft.block.Block").staticVariables
@@ -143,66 +159,132 @@ export default class OBlock {
   }
 
   public async registerBlock(): Promise<void> {
-    var custom_block = new OBlock(this.blockName, this.blockID, this.blockTexture, this.onBreak).register();
-
+    let custom_block: any;
+    if (!ModAPI.is_1_12) {
+      custom_block = new OBlock(this.blockName, this.blockID, this.blockTexture, this.onBreak).register();
+    }
+    if (ModAPI.is_1_12) {
+      var nmb_OBlock = new OBlock(this.blockName, this.blockID, this.blockTexture, this.onBreak).register();
+      var itemClass = ModAPI.reflect.getClassById("net.minecraft.item.Item");
+      var blockClass = ModAPI.reflect.getClassById("net.minecraft.block.Block");
+      custom_block = nmb_OBlock
+      blockClass.staticMethods.registerBlock0.method(
+        ModAPI.keygen.block(this.blockID),
+        ModAPI.util.str(this.blockID),
+        custom_block
+      );
+      itemClass.staticMethods.registerItemBlock0.method(custom_block);
+      console.log(custom_block || "Block registration failed");
+    }
     const self = this;
 
-    ModAPI.dedicatedServer.appendCode(`globalThis.registerServerBlock("${this.blockID}", ${this.onBreak});`);
+    if (!ModAPI.is_1_12) {
+      ModAPI.dedicatedServer.appendCode(`globalThis.registerServerBlock("${this.blockID}", ${this.onBreak});`);
+      ModAPI.addEventListener("lib:asyncsink", async () => {
+        ModAPI.addEventListener(
+          "lib:asyncsink:registeritems",
+          (renderItem: any) => {
+            renderItem.registerBlock(custom_block, ModAPI.util.str(self.blockID));
+          }
+        );
 
-    ModAPI.addEventListener("lib:asyncsink", async () => {
-      ModAPI.addEventListener(
-        "lib:asyncsink:registeritems",
-        (renderItem: any) => {
-          renderItem.registerBlock(custom_block, ModAPI.util.str(self.blockID));
-        }
-      );
-
-      AsyncSink.L10N.set(`tile.${self.blockID}.name`, self.blockName);
-      console.log(`Set localization for block ${self.blockID}`);
-      AsyncSink.setFile(
-        `resourcepacks/AsyncSinkLib/assets/minecraft/models/block/${self.blockID}.json`,
-        JSON.stringify({
-          parent: "block/cube_all",
-          textures: {
-            all: `blocks/${self.blockID}`,
-          },
-        })
-      );
-
-      AsyncSink.setFile(
-        `resourcepacks/AsyncSinkLib/assets/minecraft/models/item/${self.blockID}.json`,
-        JSON.stringify({
-          parent: `block/${self.blockID}`,
-          display: {
-            thirdperson: {
-              rotation: [10, -45, 170],
-              translation: [0, 1.5, -2.75],
-              scale: [0.375, 0.375, 0.375],
+        AsyncSink.L10N.set(`tile.${self.blockID}.name`, self.blockName);
+        console.log(`Set localization for block ${self.blockID}`);
+        AsyncSink.setFile(
+          `resourcepacks/AsyncSinkLib/assets/minecraft/models/block/${self.blockID}.json`,
+          JSON.stringify({
+            parent: "block/cube_all",
+            textures: {
+              all: `blocks/${self.blockID}`,
             },
-          },
-        })
-      );
+          })
+        );
 
-      AsyncSink.setFile(
-        `resourcepacks/AsyncSinkLib/assets/minecraft/blockstates/${self.blockID}.json`,
-        JSON.stringify({
-          variants: {
-            normal: [
-              {
-                model: self.blockID,
+        AsyncSink.setFile(
+          `resourcepacks/AsyncSinkLib/assets/minecraft/models/item/${self.blockID}.json`,
+          JSON.stringify({
+            parent: `block/${self.blockID}`,
+            display: {
+              thirdperson: {
+                rotation: [10, -45, 170],
+                translation: [0, 1.5, -2.75],
+                scale: [0.375, 0.375, 0.375],
               },
-            ],
-          },
-        })
-      );
+            },
+          })
+        );
 
-      const response = await fetch(self.blockTexture);
-      const buffer = await response.arrayBuffer();
+        AsyncSink.setFile(
+          `resourcepacks/AsyncSinkLib/assets/minecraft/blockstates/${self.blockID}.json`,
+          JSON.stringify({
+            variants: {
+              normal: [
+                {
+                  model: self.blockID,
+                },
+              ],
+            },
+          })
+        );
 
-      AsyncSink.setFile(
-        `resourcepacks/AsyncSinkLib/assets/minecraft/textures/blocks/${self.blockID}.png`,
-        buffer
-      );
-    });
+        const response = await fetch(self.blockTexture);
+        const buffer = await response.arrayBuffer();
+
+        AsyncSink.setFile(
+          `resourcepacks/AsyncSinkLib/assets/minecraft/textures/blocks/${self.blockID}.png`,
+          buffer
+        );
+      });
+    }
+    if (ModAPI.is_1_12) {
+      ModAPI.addEventListener("lib:asyncsink", async () => {
+        ModAPI.addEventListener(
+          "lib:asyncsink:registeritems",
+          (renderItem: any) => {
+            console.log("cool register block")
+            console.log(custom_block || "Block registration failed");
+            renderItem.registerBlock(custom_block, ModAPI.util.str(this.blockID));
+          }
+        );
+        AsyncSink.L10N.set("tile." + this.blockID + ".name", this.blockName);
+        console.log(`Set localization for block ${self.blockID}`);
+        console.log(custom_block || "Block registration failed");
+        AsyncSink.setFile(`resourcepacks/AsyncSinkLib/assets/minecraft/models/block/${self.blockID}.json`, JSON.stringify(
+          {
+            "parent": "block/cube_all",
+            "textures": {
+              "all": `blocks/${self.blockID}`
+            }
+          }
+        ));
+
+        AsyncSink.setFile(`resourcepacks/AsyncSinkLib/assets/minecraft/models/item/${self.blockID}.json`, JSON.stringify(
+          {
+            "parent": `block/${self.blockID}`
+          }
+        ));
+
+        AsyncSink.setFile(
+          `resourcepacks/AsyncSinkLib/assets/minecraft/blockstates/${self.blockID}.json`,
+          JSON.stringify(
+            {
+              "variants": {
+                "normal": { "model": `${this.blockID}` }
+              }
+            }
+          )
+        );
+
+        const response = await fetch(self.blockTexture);
+        const buffer = await response.arrayBuffer();
+
+        AsyncSink.setFile(
+          `resourcepacks/AsyncSinkLib/assets/minecraft/textures/blocks/${self.blockID}.png`,
+          buffer
+        );
+        ModAPI.dedicatedServer.appendCode(`globalThis.registerServerBlock("${this.blockID}", ${this.onBreak});`);
+        ModAPI.blocks[this.blockID] = custom_block;
+      })
+    }
   }
 }

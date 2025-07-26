@@ -160,7 +160,7 @@ export function registerServerBlock(blockID: string, onBreak: ($world: any, $blo
 
 
 
-    function CustomBlock(this: any): void {
+    function nmb_Oblock(this: any): void {
         blockSuper(this, ModAPI.materials.rock.getRef());
         if (!ModAPI.is_1_12) {
             this.$defaultBlockState = this.$blockState.$getBaseState();
@@ -168,9 +168,9 @@ export function registerServerBlock(blockID: string, onBreak: ($world: any, $blo
         this.$setCreativeTab(creativeTab);
     }
 
-    ModAPI.reflect.prototypeStack(BlockClass, CustomBlock);
+    ModAPI.reflect.prototypeStack(BlockClass, nmb_Oblock);
 
-    CustomBlock.prototype.$breakBlock = function (
+    nmb_Oblock.prototype.$breakBlock = function (
         $world: any,
         $blockpos: any,
         $blockstate: any
@@ -212,13 +212,13 @@ export function registerServerBlock(blockID: string, onBreak: ($world: any, $blo
     const internalRegister = (): any => {
         let custom_block: any;
         if (!ModAPI.is_1_12) {
-            custom_block = new CustomBlock()
+            custom_block = new nmb_Oblock()
                 .$setHardness(3.0)
                 .$setStepSound(BlockClass.staticVariables.soundTypePiston)
                 .$setUnlocalizedName(ModAPI.util.str(blockID));
         }
         if (ModAPI.is_1_12) {
-            custom_block = new CustomBlock()
+            custom_block = new nmb_Oblock()
                 .$setHardness(3.0)
                 .$setSoundType(ModAPI.blockSounds.PLANT.getRef())
                 .$setUnlocalizedName(ModAPI.util.str(blockID));
@@ -237,11 +237,34 @@ export function registerServerBlock(blockID: string, onBreak: ($world: any, $blo
         console.log(custom_block);
         return custom_block;
     };
+    if (!ModAPI.is_1_12) {
+        if (ModAPI.materials) {
+            return internalRegister();
+        } else {
+            ModAPI.addEventListener("bootstrap", internalRegister);
+        }
+    }
+    if (ModAPI.is_1_12) {
+        var blockClass = ModAPI.reflect.getClassById("net.minecraft.block.Block");
+        var itemClass = ModAPI.reflect.getClassById("net.minecraft.item.Item");
+        ModAPI.addEventListener("bootstrap", () => {
+            var custom_block = new nmb_Oblock()
+                .$setHardness(3.0)
+                .$setSoundType(ModAPI.blockSounds.PLANT.getRef())
+                .$setUnlocalizedName(ModAPI.util.str(blockID));
+            blockClass.staticMethods.registerBlock0.method(
+                ModAPI.keygen.block(blockID),
+                ModAPI.util.str(blockID),
+                custom_block
+            );
 
-    if (ModAPI.materials) {
-        return internalRegister();
-    } else {
-        ModAPI.addEventListener("bootstrap", internalRegister);
+            itemClass.staticMethods.registerItemBlock0.method(custom_block);
+
+            fixupBlockIds();
+            ModAPI.blocks[blockID] = custom_block;
+            console.log("Registering block on server side");
+            console.log(custom_block);
+        });
     }
 }
 
