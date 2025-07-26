@@ -267,7 +267,172 @@ export function registerServerBlock(blockID: string, onBreak: ($world: any, $blo
         });
     }
 }
+export function registerServerEntity(entityModel: string, E) {
+    ModAPI.hooks.methods.jl_String_format = ModAPI.hooks.methods.nlev_HString_format; //temporary thing to fix an issue in eaglercraft
+    // Utils
+    function AITask(name, length) {
+        return ModAPI.reflect.getClassById("net.minecraft.entity.ai." + name).constructors.find(x => x.length === length);
+    }
+    const ResourceLocation = ModAPI.reflect.getClassByName("ResourceLocation").constructors.find(x => x.length === 1);
+    const EntityPlayer = ModAPI.reflect.getClassByName("EntityPlayer");
+    const GlStateManager = Object.fromEntries(Object.values(ModAPI.reflect.getClassByName("GlStateManager").staticMethods).map(x => [x.methodNameShort, x.method]));
+    const SharedMonsterAttributes = ModAPI.reflect.getClassByName("SharedMonsterAttributes").staticVariables;
 
+    // START CUSTOM ENTITY
+    var entityClass = ModAPI.reflect.getClassById("net.minecraft.entity.passive.EntityAnimal");
+    var entitySuper = ModAPI.reflect.getSuper(entityClass, (x) => x.length === 2);
+    var nme_OEntity = function nme_OEntity($worldIn) {
+        entitySuper(this, $worldIn);
+        this.wrapped ||= ModAPI.util.wrap(this).getCorrective();
+        this.wrapped.setSize(0.4, 0.7);
+        this.wrapped.tasks.addTask(0, AITask("EntityAISwimming", 1)(this));
+        this.wrapped.tasks.addTask(1, AITask("EntityAIPanic", 2)(this, 1.9));
+        this.wrapped.tasks.addTask(2, AITask("EntityAIMate", 2)(this, 1.0));
+        this.wrapped.tasks.addTask(3, AITask("EntityAITempt", 4)(this, 1.5, ModAPI.items.bread.getRef(), 0)); //won't cause a problem as the bread is obtained when the entity is constructed.
+        this.wrapped.tasks.addTask(4, AITask("EntityAIFollowParent", 2)(this, 1.2));
+        this.wrapped.tasks.addTask(5, AITask("EntityAIWander", 2)(this, 1.1));
+        this.wrapped.tasks.addTask(6, AITask("EntityAIWatchClosest", 3)(this, ModAPI.util.asClass(EntityPlayer.class), 6));
+        this.wrapped.tasks.addTask(7, AITask("EntityAILookIdle", 1)(this));
+    }
+    ModAPI.reflect.prototypeStack(entityClass, nme_OEntity);
+    nme_OEntity.prototype.$getEyeHeight = function () {
+        this.wrapped ||= ModAPI.util.wrap(this).getCorrective();
+        return this.wrapped.height;
+    }
+
+    const originalApplyEntityAttributes = nme_OEntity.prototype.$applyEntityAttributes;
+    nme_OEntity.prototype.$applyEntityAttributes = function () {
+        this.wrapped ||= ModAPI.util.wrap(this).getCorrective();
+        originalApplyEntityAttributes.apply(this, []);
+        this.wrapped.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(5);
+        this.wrapped.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.25);
+    }
+
+    const originalLivingUpdate = nme_OEntity.prototype.$onLivingUpdate;
+    nme_OEntity.prototype.$onLivingUpdate = function () {
+        this.wrapped ||= ModAPI.util.wrap(this).getCorrective();
+        originalLivingUpdate.apply(this, []);
+        if (this.wrapped.isInWater()) {
+            this.wrapped.motionY *= 0.5;
+            this.wrapped.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(1.4);
+        } else {
+            this.wrapped.getEntityAttribute(SharedMonsterAttributes.movementSpeed).setBaseValue(0.25);
+        }
+    }
+
+    nme_OEntity.prototype.$getLivingSound = function () {
+        return ModAPI.util.str("mob.duck.quack");
+    }
+    nme_OEntity.prototype.$getHurtSound = function () {
+        return ModAPI.util.str("mob.duck.quack");
+    }
+    nme_OEntity.prototype.$getDeathSound = function () {
+        return ModAPI.util.str("mob.duck.quack");
+    }
+    nme_OEntity.prototype.$playStepSound = function () {
+        this.wrapped ||= ModAPI.util.wrap(this).getCorrective();
+        this.wrapped.playSound(ModAPI.util.str("mob.duck.step"), 0.2, 1);
+    }
+    nme_OEntity.prototype.$getDropItem = function () {
+        return ModAPI.items.feather.getRef();
+    }
+    nme_OEntity.prototype.$createChild = function (otherParent) {
+        this.wrapped ||= ModAPI.util.wrap(this).getCorrective();
+        return new nme_OEntity(this.wrapped.worldObj?.getRef() ?? null);
+    }
+    nme_OEntity.prototype.$isBreedingItem = function (itemstack) {
+        return itemstack !== null && itemstack.$getItem() === ModAPI.items.bread.getRef();
+    }
+    // END CUSTOM ENTITY
+
+
+    // START CUSTOM MODEL
+    var modelChickenClass = ModAPI.reflect.getClassById(`net.minecraft.client.model.${this.entityModel}`);
+    var modelChickenSuper = ModAPI.reflect.getSuper(modelChickenClass); //while super isn't used when extending this class, java implies the call.
+    var nmcm_OEntityModel = function nmcm_OEntityModel() {
+        modelChickenSuper(this);
+    }
+    ModAPI.reflect.prototypeStack(modelChickenClass, nmcm_OEntityModel);
+    // END CUSTOM MODEL
+
+
+    // START CUSTOM RENDERER
+    var renderClass = ModAPI.reflect.getClassById("net.minecraft.client.renderer.entity.RenderLiving");
+    var renderSuper = ModAPI.reflect.getSuper(renderClass, (x) => x.length === 4);
+    const duckTextures = ResourceLocation(ModAPI.util.str(`textures/entity/${this.entityID}.png`));
+    var nmcre_RenderOEntity = function nmcre_RenderOEntity(renderManager, modelBaseIn, shadowSizeIn) {
+        renderSuper(this, renderManager, modelBaseIn, shadowSizeIn);
+    }
+    ModAPI.reflect.prototypeStack(renderClass, nmcre_RenderOEntity);
+    nmcre_RenderOEntity.prototype.$getEntityTexture = function (entity) {
+        return duckTextures;
+    }
+    nmcre_RenderOEntity.prototype.$handleRotationFloat = function (entity, partialTicks) {
+        entity = ModAPI.util.wrap(entity);
+        if ((!entity.onGround) && (!entity.isInWater())) {
+            return 2; //falling
+        } else {
+            return 0;
+        }
+    }
+
+    const ID = ModAPI.keygen.entity(this.entityID);
+    ModAPI.reflect.getClassById("net.minecraft.entity.EntityList").staticMethods.addMapping0.method(
+        ModAPI.util.asClass(nme_OEntity),
+        {
+            $createEntity: function ($worldIn) {
+                return new nme_OEntity($worldIn);
+            }
+        },
+        ModAPI.util.str(this.entityName),
+        ID,
+        0x5e3e2d, //egg base
+        0x269166 //egg spots
+    );
+
+    const SpawnPlacementType = ModAPI.reflect.getClassById("net.minecraft.entity.EntityLiving$SpawnPlacementType").staticVariables;
+    const ENTITY_PLACEMENTS = ModAPI.util.wrap(
+        ModAPI.reflect.getClassById("net.minecraft.entity.EntitySpawnPlacementRegistry")
+            .staticVariables.ENTITY_PLACEMENTS
+    );
+    ENTITY_PLACEMENTS.put(ModAPI.util.asClass(nme_OEntity), SpawnPlacementType.ON_GROUND);
+    ModAPI.addEventListener('bootstrap', () => {
+        const SpawnListEntry = ModAPI.reflect
+            .getClassById("net.minecraft.world.biome.BiomeGenBase$SpawnListEntry")
+            .constructors.find(x => x.length === 4);
+        const BiomeGenSwamp = ModAPI.util.wrap(
+            ModAPI.reflect.getClassById("net.minecraft.world.biome.BiomeGenBase")
+                .staticVariables.swampland
+        );
+        const BiomeGenRiver = ModAPI.util.wrap(
+            ModAPI.reflect.getClassById("net.minecraft.world.biome.BiomeGenBase")
+                .staticVariables.river
+        );
+        const BiomeGenBeach = ModAPI.util.wrap(
+            ModAPI.reflect.getClassById("net.minecraft.world.biome.BiomeGenBase")
+                .staticVariables.beach
+        );
+        const duckSpawnSwamp = SpawnListEntry(ModAPI.util.asClass(nme_OEntity), 22, 3, 5);
+        const duckSpawnRiverBed = SpawnListEntry(ModAPI.util.asClass(nme_OEntity), 10, 5, 9);
+        const duckSpawnBeach = SpawnListEntry(ModAPI.util.asClass(nme_OEntity), 24, 2, 3);
+        BiomeGenSwamp.spawnableCreatureList.add(duckSpawnSwamp);
+        BiomeGenRiver.spawnableCreatureList.add(duckSpawnRiverBed);
+        BiomeGenBeach.spawnableCreatureList.add(duckSpawnBeach);
+    });
+
+
+    ModAPI.addEventListener("lib:asyncsink", async () => {
+        AsyncSink.L10N.set(`entity.${this.entityID}.name`, this.entityName);
+    });
+
+
+    return {
+        EntityDuck: nme_OEntity,
+        ModelDuck: nmcm_OEntityModel,
+        RenderDuck: nmcre_RenderOEntity,
+        duckTextures: duckTextures
+    }
+}
 /*export function isServerSide() {
     function subfunction() {
         console.log("isServerSide function called");
