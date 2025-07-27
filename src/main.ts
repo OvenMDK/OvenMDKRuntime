@@ -40,7 +40,7 @@ import OMod from "classes/core/Mod";
 import Oven from "classes/core/Oven";
 import OBlock from "classes/core/OBlock";
 import { simplecommand } from "classes/core/commands";
-import OEntity from "./classes/core/OEntity"
+//import OEntity from "./classes/core/OEntity"
 const devmode = true;
 ModAPI.events.newEvent("lib:OvenMDK:load");
 ModAPI.events.newEvent("lib:OvenMDK:loaded");
@@ -54,7 +54,7 @@ ModAPI.addEventListener("lib:OvenMDK:load", () => {
   globalThis.OvenMDK = Oven;
   globalThis.OBlock = OBlock;
   globalThis.simplecommand = simplecommand;
-  globalThis.OEntity = OEntity;
+  //globalThis.OEntity = OEntity;
   if (ModAPI.is_1_12) {
     if (!devmode) {
       alert(

@@ -170,7 +170,7 @@ export default class OItem {
             "textures": {
               "layer0": `items/${this.itemID}`
             }
-          }
+          }          
         ));
 
         const response = await fetch(self.itemTexture);
