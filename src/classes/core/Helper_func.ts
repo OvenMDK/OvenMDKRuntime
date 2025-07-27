@@ -1,7 +1,7 @@
 /*
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     Helper_func.ts
-	
+    
     Copyright 2025 BendieGames and Block_2222
     Licenced under GNU LGPL-3.0-or-later
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -267,10 +267,12 @@ export function registerServerBlock(blockID: string, onBreak: ($world: any, $blo
         });
     }
 }
-export function registerServerEntity(entityModel: string, E) {
+export function registerEntityServer(entityID: string, entityName: string, entityModel: string) {
+    console.log("entities are not finished yet! Use at your own risk!")
+    //return;
     ModAPI.hooks.methods.jl_String_format = ModAPI.hooks.methods.nlev_HString_format; //temporary thing to fix an issue in eaglercraft
     // Utils
-    function AITask(name, length) {
+    function AITask(name: string, length: number) {
         return ModAPI.reflect.getClassById("net.minecraft.entity.ai." + name).constructors.find(x => x.length === length);
     }
     const ResourceLocation = ModAPI.reflect.getClassByName("ResourceLocation").constructors.find(x => x.length === 1);
@@ -281,7 +283,7 @@ export function registerServerEntity(entityModel: string, E) {
     // START CUSTOM ENTITY
     var entityClass = ModAPI.reflect.getClassById("net.minecraft.entity.passive.EntityAnimal");
     var entitySuper = ModAPI.reflect.getSuper(entityClass, (x) => x.length === 2);
-    var nme_OEntity = function nme_OEntity($worldIn) {
+    var nme_OEntity = function nme_OEntity(this: any, $worldIn: any) {
         entitySuper(this, $worldIn);
         this.wrapped ||= ModAPI.util.wrap(this).getCorrective();
         this.wrapped.setSize(0.4, 0.7);
@@ -295,13 +297,13 @@ export function registerServerEntity(entityModel: string, E) {
         this.wrapped.tasks.addTask(7, AITask("EntityAILookIdle", 1)(this));
     }
     ModAPI.reflect.prototypeStack(entityClass, nme_OEntity);
-    nme_OEntity.prototype.$getEyeHeight = function () {
+    nme_OEntity.prototype.$getEyeHeight = function (this: any) {
         this.wrapped ||= ModAPI.util.wrap(this).getCorrective();
         return this.wrapped.height;
     }
 
     const originalApplyEntityAttributes = nme_OEntity.prototype.$applyEntityAttributes;
-    nme_OEntity.prototype.$applyEntityAttributes = function () {
+    nme_OEntity.prototype.$applyEntityAttributes = function (this: any) {
         this.wrapped ||= ModAPI.util.wrap(this).getCorrective();
         originalApplyEntityAttributes.apply(this, []);
         this.wrapped.getEntityAttribute(SharedMonsterAttributes.maxHealth).setBaseValue(5);
@@ -309,7 +311,7 @@ export function registerServerEntity(entityModel: string, E) {
     }
 
     const originalLivingUpdate = nme_OEntity.prototype.$onLivingUpdate;
-    nme_OEntity.prototype.$onLivingUpdate = function () {
+    nme_OEntity.prototype.$onLivingUpdate = function (this: any) {
         this.wrapped ||= ModAPI.util.wrap(this).getCorrective();
         originalLivingUpdate.apply(this, []);
         if (this.wrapped.isInWater()) {
@@ -320,54 +322,54 @@ export function registerServerEntity(entityModel: string, E) {
         }
     }
 
-    nme_OEntity.prototype.$getLivingSound = function () {
-        return ModAPI.util.str("mob.duck.quack");
+    nme_OEntity.prototype.$getLivingSound = function (this: any) {
+        return ModAPI.util.str("mob." + entityID + ".quack");
     }
-    nme_OEntity.prototype.$getHurtSound = function () {
-        return ModAPI.util.str("mob.duck.quack");
+    nme_OEntity.prototype.$getHurtSound = function (this: any) {
+        return ModAPI.util.str("mob." + entityID + ".quack");
     }
-    nme_OEntity.prototype.$getDeathSound = function () {
-        return ModAPI.util.str("mob.duck.quack");
+    nme_OEntity.prototype.$getDeathSound = function (this: any) {
+        return ModAPI.util.str("mob." + entityID + ".quack");
     }
-    nme_OEntity.prototype.$playStepSound = function () {
+    nme_OEntity.prototype.$playStepSound = function (this: any) {
         this.wrapped ||= ModAPI.util.wrap(this).getCorrective();
-        this.wrapped.playSound(ModAPI.util.str("mob.duck.step"), 0.2, 1);
+        this.wrapped.playSound(ModAPI.util.str("mob." + entityID + ".step"), 0.2, 1);
     }
-    nme_OEntity.prototype.$getDropItem = function () {
+    nme_OEntity.prototype.$getDropItem = function (this: any) {
         return ModAPI.items.feather.getRef();
     }
-    nme_OEntity.prototype.$createChild = function (otherParent) {
+    nme_OEntity.prototype.$createChild = function (this: any, otherParent: any) {
         this.wrapped ||= ModAPI.util.wrap(this).getCorrective();
         return new nme_OEntity(this.wrapped.worldObj?.getRef() ?? null);
     }
-    nme_OEntity.prototype.$isBreedingItem = function (itemstack) {
+    nme_OEntity.prototype.$isBreedingItem = function (this: any, itemstack: any) {
         return itemstack !== null && itemstack.$getItem() === ModAPI.items.bread.getRef();
     }
     // END CUSTOM ENTITY
 
 
     // START CUSTOM MODEL
-    var modelChickenClass = ModAPI.reflect.getClassById(`net.minecraft.client.model.${this.entityModel}`);
+    var modelChickenClass = ModAPI.reflect.getClassById(`net.minecraft.client.model.${entityModel}`);
     var modelChickenSuper = ModAPI.reflect.getSuper(modelChickenClass); //while super isn't used when extending this class, java implies the call.
-    var nmcm_OEntityModel = function nmcm_OEntityModel() {
+    var nmcm_OEntityModel = function nmcm_OEntityModel(this: any) {
         modelChickenSuper(this);
     }
     ModAPI.reflect.prototypeStack(modelChickenClass, nmcm_OEntityModel);
-    // END CUSTOM MODEL
+    // END CUSTOM MhODEL
 
 
     // START CUSTOM RENDERER
     var renderClass = ModAPI.reflect.getClassById("net.minecraft.client.renderer.entity.RenderLiving");
     var renderSuper = ModAPI.reflect.getSuper(renderClass, (x) => x.length === 4);
-    const duckTextures = ResourceLocation(ModAPI.util.str(`textures/entity/${this.entityID}.png`));
-    var nmcre_RenderOEntity = function nmcre_RenderOEntity(renderManager, modelBaseIn, shadowSizeIn) {
+    const duckTextures = ResourceLocation(ModAPI.util.str(`textures/entity/${entityID}.png`));
+    var nmcre_RenderOEntity = function nmcre_RenderOEntity(this: any, renderManager: any, modelBaseIn: any, shadowSizeIn: any) {
         renderSuper(this, renderManager, modelBaseIn, shadowSizeIn);
     }
     ModAPI.reflect.prototypeStack(renderClass, nmcre_RenderOEntity);
-    nmcre_RenderOEntity.prototype.$getEntityTexture = function (entity) {
+    nmcre_RenderOEntity.prototype.$getEntityTexture = function (this: any, entity: any) {
         return duckTextures;
     }
-    nmcre_RenderOEntity.prototype.$handleRotationFloat = function (entity, partialTicks) {
+    nmcre_RenderOEntity.prototype.$handleRotationFloat = function (this: any, entity: any, partialTicks: any) {
         entity = ModAPI.util.wrap(entity);
         if ((!entity.onGround) && (!entity.isInWater())) {
             return 2; //falling
@@ -376,15 +378,15 @@ export function registerServerEntity(entityModel: string, E) {
         }
     }
 
-    const ID = ModAPI.keygen.entity(this.entityID);
+    const ID = ModAPI.keygen.entity(entityID);
     ModAPI.reflect.getClassById("net.minecraft.entity.EntityList").staticMethods.addMapping0.method(
         ModAPI.util.asClass(nme_OEntity),
         {
-            $createEntity: function ($worldIn) {
+            $createEntity: function ($worldIn: any) {
                 return new nme_OEntity($worldIn);
             }
         },
-        ModAPI.util.str(this.entityName),
+        ModAPI.util.str(entityName),
         ID,
         0x5e3e2d, //egg base
         0x269166 //egg spots
@@ -421,9 +423,6 @@ export function registerServerEntity(entityModel: string, E) {
     });
 
 
-    ModAPI.addEventListener("lib:asyncsink", async () => {
-        AsyncSink.L10N.set(`entity.${this.entityID}.name`, this.entityName);
-    });
 
 
     return {
