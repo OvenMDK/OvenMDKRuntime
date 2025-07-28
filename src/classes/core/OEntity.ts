@@ -178,6 +178,7 @@ export default class OEntity {
             const duckSpawnSwamp = SpawnListEntry(ModAPI.util.asClass(nme_OEntity), 22, 3, 5);
             const duckSpawnRiverBed = SpawnListEntry(ModAPI.util.asClass(nme_OEntity), 10, 5, 9);
             const duckSpawnBeach = SpawnListEntry(ModAPI.util.asClass(nme_OEntity), 24, 2, 3);
+            console.log(nme_OEntity);
             BiomeGenSwamp.spawnableCreatureList.add(duckSpawnSwamp);
             BiomeGenRiver.spawnableCreatureList.add(duckSpawnRiverBed);
             BiomeGenBeach.spawnableCreatureList.add(duckSpawnBeach);

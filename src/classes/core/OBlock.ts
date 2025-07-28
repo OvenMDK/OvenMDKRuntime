@@ -80,7 +80,7 @@ export default class OBlock {
     var $$onBlockDestroyedByPlayerMethod = BlockClass.methods.onBlockDestroyedByPlayer.method;
     nmb_Oblock.prototype.$onBlockDestroyedByPlayer = function ($$world, $$blockpos, $$blockstate) {
       var $$world,$$blockpos,$$blockstate;
-      this.onBreak($$world, $$blockpos, $$blockstate)
+      self.onBreak.call($$world, $$blockpos, $$blockstate)
       return $$onBlockDestroyedByPlayerMethod(this, $$world, $$blockpos, $$blockstate);
     }
     const internalRegister = (): any => {
