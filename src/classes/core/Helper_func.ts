@@ -426,10 +426,10 @@ export function registerEntityServer(entityID: string, entityName: string, entit
 
 
     return {
-        EntityDuck: nme_OEntity,
-        ModelDuck: nmcm_OEntityModel,
-        RenderDuck: nmcre_RenderOEntity,
-        duckTextures: duckTextures
+        [`Entity${this.entityID}`]: nme_OEntity,
+        [`Model${this.entityID}`]: nmcm_OEntityModel,
+        [`Render${this.entityID}`]: nmcre_RenderOEntity,
+        [`${this.entityID}Textures`]: duckTextures
     }
 }
 /*export function isServerSide() {

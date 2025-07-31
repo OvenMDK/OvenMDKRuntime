@@ -26,14 +26,14 @@ export default class OItem {
   private itemID: string;
   private itemStack: number;
   private itemInstance: any;
-  private onRightClick: ($itemstack: any) => void;
+  private onRightClick: ($itemstack: any, $world: any) => void;
 
   constructor(
     itemName: string,
     itemID: string,
     itemStack: number,
     texture: string,
-    onRightClick: ($itemstack: any) => void
+    onRightClick: ($itemstack: any, $world: any) => void
   ) {
     this.itemName = itemName;
     this.itemID = itemID;
@@ -80,8 +80,8 @@ export default class OItem {
       ): void {
         if (!ModAPI.is_1_12) ($$player).$setItemInUse($$itemstack, 32);
         var $$itemstack, $$world, $$player;
-        self.onRightClick($$itemstack);
-        console.log(`server itemstack:`);
+        self.onRightClick($$itemstack, $$world, $$player);
+        console.log(`client itemstack:`);
         console.log($$itemstack);
         return ($$itemstack);
       }
@@ -95,7 +95,8 @@ export default class OItem {
         ($$player).$setActiveHand($handEnum);
 
         var $$itemstack, $$world, $$player;
-        self.onRightClick($$itemstack);
+        self.onRightClick($$itemstack, $$world, $$player);
+        console.log(`client itemstack:`);
         console.log($$itemstack);
         return ($$ActionResult($$ResultEnum.SUCCESS, $$itemstack));
       }
