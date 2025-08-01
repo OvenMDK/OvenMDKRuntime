@@ -29,7 +29,10 @@ export default class OEntity {
         });
     }
     private registerEntityClient() {
-        console.log("entities are not finished yet! Use at your own risk!")
+        if (ModAPI.is_1_12) {
+            throw new Error("OEntity does not support 1.12, please use 1.8.8 for full support");
+        }
+        console.warn("entities are not finished yet! Use at your own risk!")
         //return;
         ModAPI.hooks.methods.jl_String_format = ModAPI.hooks.methods.nlev_HString_format; //temporary thing to fix an issue in eaglercraft
         // Utils
@@ -191,10 +194,10 @@ export default class OEntity {
 
 
         return {
-            EntityDuck: nme_OEntity,
-            ModelDuck: nmcm_OEntityModel,
-            RenderDuck: nmcre_RenderOEntity,
-            duckTextures: duckTextures
+            [`Entity${this.entityID}`]: nme_OEntity,
+            [`Model${this.entityID}`]: nmcm_OEntityModel,
+            [`Render${this.entityID}`]: nmcre_RenderOEntity,
+            [`${this.entityID}Textures`]: duckTextures
         }
     }
     private registerOEntity() {
@@ -232,10 +235,14 @@ export default class OEntity {
                 }
             ]);
 
-            ModAPI.mc.renderManager.entityRenderMap.put(ModAPI.util.asClass(data.EntityDuck), new data.RenderDuck(ModAPI.mc.renderManager.getRef(), new data.ModelDuck(), 0.3));
-            ModAPI.promisify(ModAPI.mc.renderEngine.bindTexture)(data.duckTextures).then(() => {
+            ModAPI.mc.renderManager.entityRenderMap.put(ModAPI.util.asClass(data[`Entity${this.entityID}`]), new data[`Render${this.entityID}`](ModAPI.mc.renderManager.getRef(), new data[`Model${this.entityID}`](), 0.3));
+            ModAPI.promisify(ModAPI.mc.renderEngine.bindTexture)(data[`${this.entityID}Textures`]).then(() => {
                 console.log("Loaded OEntity texture into cache.");
             });
         });
+        console.log(data);
+        const key = `OEntity.${this.entityID}`;
+        globalThis[key] = data;
+
     }
 }
