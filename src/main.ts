@@ -35,6 +35,7 @@ import {
   registerServerItem,
   registerServerBlock,
   registerEntityServer,
+  OvenMDK__defineExecCmdAsGlobal,
 } from "classes/core/Helper_func";
 import OItem from "classes/core/OItem";
 import OMod from "classes/core/Mod";
@@ -73,6 +74,9 @@ ModAPI.addEventListener("lib:OvenMDK:load", () => {
     `globalThis.registerServerItem = ${registerServerItem};`
   );
   console.log("Register Item serverside function loaded");
+  ModAPI.dedicatedServer.appendCode(OvenMDK__defineExecCmdAsGlobal);
+  OvenMDK__defineExecCmdAsGlobal();
+  console.log("OvenMDK__ExecCmdAsGlobal serverside and clientside function loaded");
   ModAPI.dedicatedServer.appendCode(
     `globalThis.registerServerBlock = ${registerServerBlock};`
   );

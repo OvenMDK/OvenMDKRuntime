@@ -441,3 +441,46 @@ export function registerEntityServer(entityID: string, entityName: string, entit
     subfunction();
     console.log(`isServerSide: ${ModAPI.isServer}`);
 }*/
+export function OvenMDK__defineExecCmdAsGlobal() {
+    var getServer = ModAPI.reflect.getClassById("net.minecraft.server.MinecraftServer").staticMethods.getServer?.method;
+    globalThis.OvenMDK__executeCommandAs = function OvenMDK__executeCommandAs($commandsender, command, feedback) {
+        var server = getServer ?
+            getServer() : //1.8
+            ModAPI.reflect.getClassById("net.minecraft.server.MinecraftServer").staticVariables.server; //1.12
+        console.log(server);
+        if (!server) { return };
+        var commandManager = server.$commandManager;
+
+        //lie a bit
+        var x = $commandsender.$canCommandSenderUseCommand;
+        $commandsender.$canCommandSenderUseCommand = () => 1;
+
+        var y = $commandsender.$sendCommandFeedback;
+        $commandsender.$sendCommandFeedback = feedback ? () => 1 : () => 0;
+
+        const notifyOps0 = ModAPI.hooks.methods.nmc_CommandBase_notifyOperators0;
+        const notifyOps = ModAPI.hooks.methods.nmc_CommandBase_notifyOperators;
+        const addChatMsg = $commandsender.$addChatMessage;
+
+        if (!feedback) {
+            ModAPI.hooks.methods.nmc_CommandBase_notifyOperators0 = () => { };
+            ModAPI.hooks.methods.nmc_CommandBase_notifyOperators = () => { };
+            $commandsender.$addChatMessage = () => { };
+        }
+
+        try {
+            commandManager.$executeCommand($commandsender, ModAPI.util.str(command));
+        } catch (error) {
+            console.error(error);
+        }
+
+        if (!feedback) {
+            ModAPI.hooks.methods.nmc_CommandBase_notifyOperators0 = notifyOps0;
+            ModAPI.hooks.methods.nmc_CommandBase_notifyOperators = notifyOps;
+            $commandsender.$addChatMessage = addChatMsg;
+        }
+
+        $commandsender.$canCommandSenderUseCommand = x;
+        $commandsender.$sendCommandFeedback = y;
+    }
+}
