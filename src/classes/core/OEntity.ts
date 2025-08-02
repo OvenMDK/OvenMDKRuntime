@@ -4,17 +4,20 @@ export default class OEntity {
     private entityName: string;
     private entityID: string;
     private entityModel: string;
+    private entityBreedItem: string;
     constructor(
         entityName: string,
         entityID: string,
         entityTexture: string,
         entityModel: string
+        entityBreedItem: string
 
     ) {
         this.entityName = entityName
         this.entityID = entityID
         this.entityTexture = entityTexture
         this.entityModel = entityModel
+        this.entityBreedItem = entityBreedItem
     }
     private async waitForRenderManager() {
         return new Promise((res: any, rej: any) => {
@@ -107,7 +110,7 @@ export default class OEntity {
             return new nme_OEntity(this.wrapped.worldObj?.getRef() ?? null);
         }
         nme_OEntity.prototype.$isBreedingItem = function (itemstack) {
-            return itemstack !== null && itemstack.$getItem() === ModAPI.items.bread.getRef();
+            return itemstack !== null && itemstack.$getItem() === ModAPI.items[`${this.entityBreedItem}`].getRef();
         }
         // END CUSTOM ENTITY
 
