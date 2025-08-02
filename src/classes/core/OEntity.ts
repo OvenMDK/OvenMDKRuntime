@@ -5,19 +5,22 @@ export default class OEntity {
     private entityID: string;
     private entityModel: string;
     private entityBreedItem: string;
+    private entityDropItem: string;
     constructor(
         entityName: string,
         entityID: string,
         entityTexture: string,
-        entityModel: string
-        entityBreedItem: string
+        entityModel: string,
+        entityBreedItem?: string,
+        entityDropItem?: string 
 
     ) {
         this.entityName = entityName
         this.entityID = entityID
         this.entityTexture = entityTexture
         this.entityModel = entityModel
-        this.entityBreedItem = entityBreedItem
+        this.entityBreedItem = entityBreedItem || "wheat"; //default breed item
+        this.entityDropItem = entityDropItem || "feather"; //default drop item
     }
     private async waitForRenderManager() {
         return new Promise((res: any, rej: any) => {

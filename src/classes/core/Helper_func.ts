@@ -20,7 +20,7 @@
     You should have received a copy of the GNU Lesser General Public License along 
     with Oven MDK. If not, see <https://www.gnu.org/licenses/>.
 */
-export function registerServerItem(itemID: string, itemStack: number, onRightClick: ($$itemstack: any) => void) {
+export function registerServerItem(itemID: string, itemStack: number, onRightClick: ($$itemstack: any) => void, onItemUse?: ($$itemstack: any, $$world: any, $$player: any, $$blockpos: any) => void): any {
     /*if (isServer === false) {
         console.log("registerServerItem can only be used on the server side.");
         return;
@@ -86,7 +86,28 @@ export function registerServerItem(itemID: string, itemStack: number, onRightCli
             return ($$ActionResult($$ResultEnum.SUCCESS, $$itemstack));
         }
     }
-
+    if (!ModAPI.is_1_12) {
+        nmi_OvenItem.prototype.$onItemUse0 = function (
+            $$itemstack: any,
+            $$player: any,
+            $$world: any,
+            $$blockpos: any,
+        ) {
+            var $$itemstack, $$world, $$player, $$blockpos;
+            onItemUse($$itemstack, $$world, $$player, $$blockpos);
+            console.log(`client itemstack:`);
+            console.log($$itemstack);
+            return 0;
+        }
+    };
+    if (ModAPI.is_1_12) {
+        var $$ResultEnum = ModAPI.reflect.getClassByName("EnumActionResult").staticVariables;
+        nmi_OvenItem.prototype.$onItemUse = function ($$itemstack, $$player, $$world, $$blockpos) {
+            var $$itemstack, $$player, $$world, $$blockpos;
+            if (onItemUse) { onItemUse($$itemstack, $$world, $$player, $$blockpos); }
+            return $$ResultEnum.PASS;
+        }
+    }
     nmi_OvenItem.prototype.$onUpdate = function ($$itemstack, $$world, $$player, $$hotbar_slot, $$is_held) {
         $$is_held = ($$is_held) ? true : false;
         return ($$itemstack);
@@ -472,9 +493,9 @@ export function OvenMDK__defineExecCmdAsGlobal(): void {
         const addChatMsg = $commandsender.$addChatMessage;
 
         if (!feedback) {
-            ModAPI.hooks.methods.nmc_CommandBase_notifyOperators0 = () => {};
-            ModAPI.hooks.methods.nmc_CommandBase_notifyOperators = () => {};
-            $commandsender.$addChatMessage = () => {};
+            ModAPI.hooks.methods.nmc_CommandBase_notifyOperators0 = () => { };
+            ModAPI.hooks.methods.nmc_CommandBase_notifyOperators = () => { };
+            $commandsender.$addChatMessage = () => { };
         }
 
         try {

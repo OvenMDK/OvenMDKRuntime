@@ -21,25 +21,42 @@
     with Oven MDK. If not, see <https://www.gnu.org/licenses/>.
 */
 export default class OItem {
+
   private itemTexture: string;
   private itemName: string;
   private itemID: string;
   private itemStack: number;
   private itemInstance: any;
-  private onRightClick: ($itemstack: any, $world: any) => void;
+  private onRightClick: ($itemstack: any, $world: any, $player: any) => void;
+
+  public onItemUse?: (
+    $itemstack: any,
+    $world: any,
+    $player: any,
+    $blockpos: any
+  ) => void;
 
   constructor(
     itemName: string,
     itemID: string,
     itemStack: number,
     texture: string,
-    onRightClick: ($itemstack: any, $world: any) => void
+    onRightClick: ($itemstack: any, $world: any, $player: any) => void,
+    onItemUse?: (
+      $itemstack: any,
+      $world: any,
+      $player: any,
+      $blockpos: any
+    ) => void
   ) {
     this.itemName = itemName;
     this.itemID = itemID;
     this.itemStack = itemStack;
     this.itemTexture = texture;
     this.onRightClick = onRightClick;
+
+    // Assign optional onItemUse if provided
+    if (onItemUse) this.onItemUse = onItemUse;
   }
 
   public registerClient(): void {
@@ -101,6 +118,28 @@ export default class OItem {
         return ($$ActionResult($$ResultEnum.SUCCESS, $$itemstack));
       }
     }
+    if (!ModAPI.is_1_12) {
+      nmi_OvenItem.prototype.$onItemUse0 = function (
+        $$itemstack: any,
+        $$player: any,
+        $$world: any,
+        $$blockpos: any,
+      ) {
+        var $$itemstack, $$world, $$player, $$blockpos;
+        self.onItemUse($$itemstack, $$world, $$player, $$blockpos);
+        console.log(`client itemstack:`);
+        console.log($$itemstack);
+        return 0;
+      }
+    };
+    if (ModAPI.is_1_12) {
+      var $$ResultEnum = ModAPI.reflect.getClassByName("EnumActionResult").staticVariables;
+      nmi_OvenItem.prototype.$onItemUse = function ($$itemstack, $$player, $$world, $$blockpos) {
+        var $$itemstack, $$player, $$world, $$blockpos;
+        if (self.onItemUse) {self.onItemUse($$itemstack, $$world, $$player, $$blockpos);}
+        return $$ResultEnum.PASS;
+      }
+    }
     nmi_OvenItem.prototype.$onUpdate = function ($$itemstack, $$world, $$player, $$hotbar_slot, $$is_held) {
       $$is_held = ($$is_held) ? true : false;
       return ($$itemstack);
@@ -152,8 +191,8 @@ export default class OItem {
   public async registerItem(): Promise<void> {
 
     const self = this;
-    var custom_item = new OItem(this.itemName, this.itemID, this.itemStack, this.itemTexture, this.onRightClick).registerClient();
-    ModAPI.dedicatedServer.appendCode(`globalThis.registerServerItem("${this.itemID}", ${this.itemStack}, ${this.onRightClick});`);
+    var custom_item = new OItem(this.itemName, this.itemID, this.itemStack, this.itemTexture, this.onRightClick, this.onItemUse).registerClient();
+    ModAPI.dedicatedServer.appendCode(`globalThis.registerServerItem("${this.itemID}", ${this.itemStack}, ${this.onRightClick}, ${this.onItemUse});`);
     if (ModAPI.is_1_12) {
       ModAPI.addEventListener("lib:asyncsink", async () => {
         ModAPI.addEventListener(
@@ -171,7 +210,7 @@ export default class OItem {
             "textures": {
               "layer0": `items/${this.itemID}`
             }
-          }          
+          }
         ));
 
         const response = await fetch(self.itemTexture);

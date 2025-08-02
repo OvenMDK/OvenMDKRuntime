@@ -96,7 +96,7 @@ ModAPI.addEventListener("lib:OvenMDK:loaded", () => {
     │                                   │
     │   welcome to ovenMDK              │
     │                                   │
-    │   A mod maker kit for starters    │
+    │   A mod dev kit for starters      │
     │                                   │
     └───────────────────────────────────┘
     `);
