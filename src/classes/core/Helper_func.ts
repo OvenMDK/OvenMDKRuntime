@@ -66,7 +66,7 @@ export function registerServerItem(itemID: string, itemStack: number, onRightCli
         ): void {
             if (!ModAPI.is_1_12) ($$player).$setItemInUse($$itemstack, 32);
             var $$itemstack, $$world, $$player;
-            //onRightClick($$itemstack);
+            onRightClick($$itemstack, $$world, $$player);
             console.log(`server itemstack:`);
             console.log($$itemstack);
             return ($$itemstack);
@@ -81,7 +81,7 @@ export function registerServerItem(itemID: string, itemStack: number, onRightCli
             ($$player).$setActiveHand($handEnum);
 
             var $$itemstack, $$world, $$player;
-            //onRightClick($$itemstack);
+            onRightClick($$itemstack, $$world, $$player);
             console.log($$itemstack);
             return ($$ActionResult($$ResultEnum.SUCCESS, $$itemstack));
         }
@@ -441,21 +441,30 @@ export function registerEntityServer(entityID: string, entityName: string, entit
     subfunction();
     console.log(`isServerSide: ${ModAPI.isServer}`);
 }*/
-export function OvenMDK__defineExecCmdAsGlobal() {
-    var getServer = ModAPI.reflect.getClassById("net.minecraft.server.MinecraftServer").staticMethods.getServer?.method;
-    globalThis.OvenMDK__executeCommandAs = function OvenMDK__executeCommandAs($commandsender, command, feedback) {
-        var server = getServer ?
-            getServer() : //1.8
-            ModAPI.reflect.getClassById("net.minecraft.server.MinecraftServer").staticVariables.server; //1.12
-        console.log(server);
-        if (!server) { return };
-        var commandManager = server.$commandManager;
+export function OvenMDK__defineExecCmdAsGlobal(): void {
+    // Get server method for different Minecraft versions
+    const getServer =
+        ModAPI.reflect.getClassById("net.minecraft.server.MinecraftServer").staticMethods.getServer?.method;
 
-        //lie a bit
-        var x = $commandsender.$canCommandSenderUseCommand;
+    // Define global function
+    (globalThis as any).OvenMDK__executeCommandAs = function OvenMDK__executeCommandAs(
+        $commandsender: any,
+        command: string,
+        feedback: boolean
+    ): void {
+        const server = getServer
+            ? getServer() // 1.8
+            : ModAPI.reflect.getClassById("net.minecraft.server.MinecraftServer").staticVariables.server; // 1.12
+
+        if (!server) return;
+        console.log(server)
+        const commandManager = server.$commandManager;
+
+        // Temporarily override permissions
+        const originalCanCommand = $commandsender.$canCommandSenderUseCommand;
         $commandsender.$canCommandSenderUseCommand = () => 1;
 
-        var y = $commandsender.$sendCommandFeedback;
+        const originalFeedback = $commandsender.$sendCommandFeedback;
         $commandsender.$sendCommandFeedback = feedback ? () => 1 : () => 0;
 
         const notifyOps0 = ModAPI.hooks.methods.nmc_CommandBase_notifyOperators0;
@@ -463,9 +472,9 @@ export function OvenMDK__defineExecCmdAsGlobal() {
         const addChatMsg = $commandsender.$addChatMessage;
 
         if (!feedback) {
-            ModAPI.hooks.methods.nmc_CommandBase_notifyOperators0 = () => { };
-            ModAPI.hooks.methods.nmc_CommandBase_notifyOperators = () => { };
-            $commandsender.$addChatMessage = () => { };
+            ModAPI.hooks.methods.nmc_CommandBase_notifyOperators0 = () => {};
+            ModAPI.hooks.methods.nmc_CommandBase_notifyOperators = () => {};
+            $commandsender.$addChatMessage = () => {};
         }
 
         try {
@@ -480,7 +489,10 @@ export function OvenMDK__defineExecCmdAsGlobal() {
             $commandsender.$addChatMessage = addChatMsg;
         }
 
-        $commandsender.$canCommandSenderUseCommand = x;
-        $commandsender.$sendCommandFeedback = y;
-    }
+        // Restore original permissions and feedback
+        $commandsender.$canCommandSenderUseCommand = originalCanCommand;
+        $commandsender.$sendCommandFeedback = originalFeedback;
+    };
 }
+
+
