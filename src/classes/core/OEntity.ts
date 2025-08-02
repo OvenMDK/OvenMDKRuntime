@@ -1,4 +1,5 @@
 
+
 export default class OEntity {
     private entityTexture: string;
     private entityName: string;

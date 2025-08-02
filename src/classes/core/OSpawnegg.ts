@@ -21,23 +21,17 @@
     with Oven MDK. If not, see <https://www.gnu.org/licenses/>.
 */
 
-exort default class OSpawnegg {
+export default class OSpawnegg {
     private itemTexture: string;
-    private itemName: string;
     private itemID: string;
-    private itemStack: number;
     private entityID: string;
     
     constructor(
-        itemName: string,
         itemID: string,
-        itemStack: number,
         texture: string,
         entityID: string
     ) {
-        this.itemName = itemName;
         this.itemID = itemID;
-        this.itemStack = itemStack;
         this.itemTexture = texture;
         this.entityID = entityID;
     }
@@ -46,8 +40,9 @@ exort default class OSpawnegg {
         // Implementation for registering the spawn egg client-side
         
     }
-    }
+
     public registerOSpawnegg(): void {
         // async stuff
         // also you need a helper function
     }
+}
