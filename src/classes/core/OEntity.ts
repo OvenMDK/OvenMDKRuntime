@@ -1,3 +1,5 @@
+import OItem from "./OItem";
+import OSpawnegg from "./OSpawnegg";
 
 
 export default class OEntity {
@@ -35,6 +37,7 @@ export default class OEntity {
             check();
         });
     }
+
     private registerEntityClient() {
         if (ModAPI.is_1_12) {
             throw new Error("OEntity does not support 1.12, please use 1.8.8 for full support");
@@ -207,6 +210,7 @@ export default class OEntity {
             [`${this.entityID}Textures`]: duckTextures
         }
     }
+
     private registerOEntity() {
         ModAPI.dedicatedServer.appendCode(`globalThis.registerEntityServer("${this.entityID}", "${this.entityName}", "${this.entityModel}");`);
         var data = this.registerEntityClient();
@@ -251,5 +255,17 @@ export default class OEntity {
         const key = `OEntity.${this.entityID}`;
         globalThis[key] = data;
 
+    }
+
+    public createSpawnegg(texture) {
+        var spawnEgg = new OItem(`Spawn ${this.entityName}`, `spawnegg_${this.entityID}`, 64, texture, () => {
+            if (ModAPI.is_1_12) {
+                
+            }
+        })
+
+        spawnEgg.registerItem();
+
+        return spawnEgg;
     }
 }

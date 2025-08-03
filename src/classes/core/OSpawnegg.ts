@@ -23,7 +23,6 @@
 
 export default class OSpawnegg {
     private itemTexture: string;
-    private itemID: string;
     private entityID: string;
     
     constructor(
@@ -31,7 +30,6 @@ export default class OSpawnegg {
         texture: string,
         entityID: string
     ) {
-        this.itemID = itemID;
         this.itemTexture = texture;
         this.entityID = entityID;
     }
