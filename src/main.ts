@@ -42,7 +42,7 @@ import OMod from "classes/core/Mod";
 import Oven from "classes/core/Oven";
 import OBlock from "classes/core/OBlock";
 import { simplecommand } from "classes/core/commands";
-import OEntity from "./classes/core/OEntity"
+import OEntity from "./classes/core/OEntity";
 const devmode = true;
 ModAPI.events.newEvent("lib:OvenMDK:load");
 ModAPI.events.newEvent("lib:OvenMDK:loaded");
@@ -76,7 +76,9 @@ ModAPI.addEventListener("lib:OvenMDK:load", () => {
   console.log("Register Item serverside function loaded");
   ModAPI.dedicatedServer.appendCode(OvenMDK__defineExecCmdAsGlobal);
   OvenMDK__defineExecCmdAsGlobal();
-  console.log("OvenMDK__ExecCmdAsGlobal serverside and clientside function loaded");
+  console.log(
+    "OvenMDK__ExecCmdAsGlobal serverside and clientside function loaded"
+  );
   ModAPI.dedicatedServer.appendCode(
     `globalThis.registerServerBlock = ${registerServerBlock};`
   );
@@ -101,5 +103,10 @@ ModAPI.addEventListener("lib:OvenMDK:loaded", () => {
     └───────────────────────────────────┘
     `);
 });
-
+ModAPI.addCredit(
+  "OvenMDK Coding lead",
+  "BendieGames",
+  " - Made OvenMDK\n - Coded most of OvenMDK"
+);
+ModAPI.addCredit("OvenMDK Founder", "Block_2222", " - Founded OvenMDK");
 ModAPI.events.callEvent("lib:OvenMDK:load", {});
