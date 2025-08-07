@@ -3,6 +3,7 @@
         "module": "ES6",
         "lib": ["es5", "es6", "dom", "WebWorker"],
         "rootDir": "src",
-        "baseUrl": "src/"
+        "baseUrl": "src/",
+        "typeRoots": ["src/d.ts", "node_modules/@types"]
     }
 }
