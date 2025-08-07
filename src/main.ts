@@ -36,6 +36,7 @@ import {
   registerServerBlock,
   registerEntityServer,
   OvenMDK__defineExecCmdAsGlobal,
+  registerOvenOreServer,
 } from "classes/core/Helper_func";
 import OItem from "classes/core/OItem";
 import OMod from "classes/core/Mod";

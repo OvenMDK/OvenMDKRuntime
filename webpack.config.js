@@ -30,9 +30,9 @@ module.exports = {
       },
       { test: /\.css$/, use: "css-loader" },
     ],
-  }
-  /*optimization: {
-    mangleExports: 'deterministic',
+  },
+  optimization: {
+    mangleExports: "deterministic",
     minimize: false,
-  }*/
+  },
 };
