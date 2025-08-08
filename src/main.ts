@@ -29,6 +29,7 @@ ModAPI.meta.version("Alpha v0.2");
 ModAPI.meta.description(
   "Unofficial dev kit used for simplifying EaglerForge mod development."
 );
+
 ModAPI.meta.credits("BendieGames and Block_2222");
 ModAPI.meta.icon(icon);
 import {
@@ -44,6 +45,7 @@ import Oven from "classes/core/Oven";
 import OBlock from "classes/core/OBlock";
 import { simplecommand } from "classes/core/commands";
 import OEntity from "./classes/core/OEntity";
+import OvenOre from "classes/core/OvenOre";
 const devmode = true;
 ModAPI.events.newEvent("lib:OvenMDK:load");
 ModAPI.events.newEvent("lib:OvenMDK:loaded");
@@ -58,6 +60,8 @@ ModAPI.addEventListener("lib:OvenMDK:load", () => {
   globalThis.OvenMDK = Oven;
   globalThis.OBlock = OBlock;
   globalThis.simplecommand = simplecommand;
+  globalThis.OvenOre = OvenOre;
+  globalThis.registerOvenOreServer = registerOvenOreServer;
   globalThis.OEntity = OEntity;
   if (ModAPI.is_1_12) {
     if (!devmode) {
@@ -75,6 +79,10 @@ ModAPI.addEventListener("lib:OvenMDK:load", () => {
     `globalThis.registerServerItem = ${registerServerItem};`
   );
   console.log("Register Item serverside function loaded");
+  ModAPI.dedicatedServer.appendCode(
+    `globalThis.registerOvenOreServer = ${registerOvenOreServer};`
+  );
+  console.log("Register Oven Ore serverside function loaded");
   ModAPI.dedicatedServer.appendCode(OvenMDK__defineExecCmdAsGlobal);
   OvenMDK__defineExecCmdAsGlobal();
   console.log(
@@ -101,8 +109,31 @@ ModAPI.addEventListener("lib:OvenMDK:loaded", () => {
     │                                   │
     │   A mod dev kit for starters      │
     │                                   │
+    │   Version: v0.2                   │
+    │                                   │
     └───────────────────────────────────┘
     `);
+  ModAPI.require("player")
+  var Player = ModAPI.player();
+  simplecommand("/ovenmdk", "log_1", () => {
+    ModAPI.displayToChat(`
+      OvenMDK Runtime v0.1
+      Made by BendieGames and Block_2222
+      - Added basic core classes
+      ( Not much can be documented due to so little being added )`)
+  });
+  simplecommand("/ovenmdk", "log_2", () => {
+    ModAPI.displayToChat(`
+      OvenMDK Runtime v0.2
+      Made by BendieGames and Block_2222
+      - Added support for 1.12
+      - Added support for OvenOre
+      - Added support for OEntity
+      - QOL improvements
+      - Added support for OvenMDK__ExecCmdAsGlobal
+      - Added support for OvenMDK__defineExecCmdAsGlobal
+      - Added support for simplecommands`)
+  });
 });
 ModAPI.addCredit(
   "OvenMDK Coding lead",
