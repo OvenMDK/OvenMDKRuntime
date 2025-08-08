@@ -113,14 +113,14 @@ ModAPI.addEventListener("lib:OvenMDK:loaded", (version) => {
     │                                   │
     └───────────────────────────────────┘
     `);
-  simplecommand("/ovenmdk", "log_1", () => {
+  simplecommand("/ovenmdk", " log_1", () => {
     ModAPI.displayToChat(`
       OvenMDK Runtime v0.1
       Made by BendieGames and Block_2222
       - Added basic core classes
       ( Not much can be documented due to so little being added )`)
   });
-  simplecommand("/ovenmdk", "log_2", () => {
+  simplecommand("/ovenmdk", " log_2", () => {
     ModAPI.displayToChat(`
       OvenMDK Runtime v0.2
       Made by BendieGames and Block_2222
