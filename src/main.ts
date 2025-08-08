@@ -98,7 +98,7 @@ ModAPI.addEventListener("lib:OvenMDK:load", () => {
   console.log("Register Block serverside function loaded");
   ModAPI.events.callEvent("lib:OvenMDK:loaded", {});
 });
-ModAPI.addEventListener("lib:OvenMDK:loaded", () => {
+ModAPI.addEventListener("lib:OvenMDK:loaded", (version) => {
   console.log("OvenMDK Runtime has finished loading");
   console.log(`
     ┌───────────────────────────────────┐
@@ -109,7 +109,7 @@ ModAPI.addEventListener("lib:OvenMDK:loaded", () => {
     │                                   │
     │   A mod dev kit for starters      │
     │                                   │
-    │   Version: v0.2                   │
+    │   Version: ${version}                   │
     │                                   │
     └───────────────────────────────────┘
     `);
@@ -139,4 +139,4 @@ ModAPI.addCredit(
   " - Made OvenMDK\n - Coded most of OvenMDK"
 );
 ModAPI.addCredit("OvenMDK Founder", "Block_2222", " - Founded OvenMDK");
-ModAPI.events.callEvent("lib:OvenMDK:load", {});
+ModAPI.events.callEvent("lib:OvenMDK:load", {version: "v0.2"});
