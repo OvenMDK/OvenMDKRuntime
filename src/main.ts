@@ -113,8 +113,6 @@ ModAPI.addEventListener("lib:OvenMDK:loaded", () => {
     │                                   │
     └───────────────────────────────────┘
     `);
-  ModAPI.require("player")
-  var Player = ModAPI.player();
   simplecommand("/ovenmdk", "log_1", () => {
     ModAPI.displayToChat(`
       OvenMDK Runtime v0.1
