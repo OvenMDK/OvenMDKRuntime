@@ -40,4 +40,17 @@ export default class Oven {
     }*/
     this.mods.push(modClass);
   }
+
+  static util = {
+    oggtoBase64string: (ogg: string) => {
+      const base64 = btoa(
+        new Uint8Array(ogg.split(",").map((x) => parseInt(x, 10))).reduce(
+          (data, byte) => data + String.fromCharCode(byte),
+          ""
+        )
+      );
+      return base64;
+    },
+  };
+    
 }

@@ -25,7 +25,7 @@
 import icon from "ASSETS/defaultIcon.png";
 
 ModAPI.meta.title("OvenMDK Runtime");
-ModAPI.meta.version("Alpha v0.2");
+ModAPI.meta.version("Alpha v0.3");
 ModAPI.meta.description(
   "Unofficial dev kit used for simplifying EaglerForge mod development."
 );
@@ -132,11 +132,19 @@ ModAPI.addEventListener("lib:OvenMDK:loaded", (version) => {
       - Added support for OvenMDK__defineExecCmdAsGlobal
       - Added support for simplecommands`)
   });
+  simplecommand("/ovenmdk", " log_3", () => {
+    ModAPI.displayToChat(`
+      OvenMDK Runtime v0.3
+      Made by BendieGames and Block_2222
+      - Added more OEntity customization
+        - Added more support for Model hitboexes
+        - Added custom entity sound support`)
+  });
 });
 ModAPI.addCredit(
-  "OvenMDK Coding lead",
+  "OvenMDK Runtime",
   "BendieGames",
   " - Made OvenMDK\n - Coded most of OvenMDK"
 );
-ModAPI.addCredit("OvenMDK Founder", "Block_2222", " - Founded OvenMDK");
-ModAPI.events.callEvent("lib:OvenMDK:load", {version: "v0.2"});
+ModAPI.addCredit("OvenMDK Runtime", "Block_2222", " - Founded OvenMDK");
+ModAPI.events.callEvent("lib:OvenMDK:load", { version: "v0.3" });

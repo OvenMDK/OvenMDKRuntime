@@ -339,7 +339,11 @@ export function registerServerBlock(
 export function registerEntityServer(
   entityID: string,
   entityName: string,
-  entityModel: string
+  entityModel: string,
+  entityBreedItem: string,
+  entityDropItem: string,
+  eggBase: number,
+  eggSpots: number
 ) {
   console.log("entities are not finished yet! Use at your own risk!");
   //return;
@@ -365,6 +369,52 @@ export function registerEntityServer(
   ).staticVariables;
 
   // START CUSTOM ENTITY
+  let entitySize1 = 0.4;
+  let entitySize2 = 0.7;
+
+  if (entityModel === "ModelChicken") {
+    entitySize1 = 0.4; // Chicken
+    entitySize2 = 0.7;
+  } else if (entityModel === "ModelCow") {
+    entitySize1 = 0.9; // Cow
+    entitySize2 = 1.4;
+  } else if (entityModel === "ModelMooshroom") {
+    entitySize1 = 0.9; // Mooshroom
+    entitySize2 = 1.4;
+  } else if (entityModel === "ModelPig") {
+    entitySize1 = 0.9; // Pig
+    entitySize2 = 0.9;
+  } else if (entityModel === "ModelSheep") {
+    entitySize1 = 0.9; // Sheep
+    entitySize2 = 1.3;
+  } else if (entityModel === "ModelHorse") {
+    entitySize1 = 1.3965; // Horse
+    entitySize2 = 1.6;    // Height can vary slightly
+  } else if (entityModel === "ModelRabbit") {
+    entitySize1 = 0.4; // Rabbit
+    entitySize2 = 0.5;
+  } else if (entityModel === "ModelSquid") {
+    entitySize1 = 0.8; // Squid
+    entitySize2 = 0.8;
+  } else if (entityModel === "ModelBat") {
+    entitySize1 = 0.5; // Bat
+    entitySize2 = 0.9;
+  } else if (entityModel === "ModelOcelot") {
+    entitySize1 = 0.6; // Ocelot (wild)
+    entitySize2 = 0.7;
+  } else if (entityModel === "ModelWolf") {
+    entitySize1 = 0.6; // Wolf
+    entitySize2 = 0.85;
+  } else if (entityModel === "ModelVillager") {
+    entitySize1 = 0.6; // Villager
+    entitySize2 = 1.95;
+  } else if (entityModel === "ModelIronGolem") {
+    entitySize1 = 1.4; // Iron Golem
+    entitySize2 = 2.9;
+  } else if (entityModel === "ModelSnowman" || entityModel === "ModelSnowGolem") {
+    entitySize1 = 0.7; // Snow Golem
+    entitySize2 = 1.9;
+  }
   var entityClass = ModAPI.reflect.getClassById(
     "net.minecraft.entity.passive.EntityAnimal"
   );
@@ -372,13 +422,13 @@ export function registerEntityServer(
   var nme_OEntity = function nme_OEntity(this: any, $worldIn: any) {
     entitySuper(this, $worldIn);
     this.wrapped ||= ModAPI.util.wrap(this).getCorrective();
-    this.wrapped.setSize(0.4, 0.7);
+    this.wrapped.setSize(entitySize1, entitySize2);
     this.wrapped.tasks.addTask(0, AITask("EntityAISwimming", 1)(this));
     this.wrapped.tasks.addTask(1, AITask("EntityAIPanic", 2)(this, 1.9));
     this.wrapped.tasks.addTask(2, AITask("EntityAIMate", 2)(this, 1.0));
     this.wrapped.tasks.addTask(
       3,
-      AITask("EntityAITempt", 4)(this, 1.5, ModAPI.items.bread.getRef(), 0)
+      AITask("EntityAITempt", 4)(this, 1.5, ModAPI.items[`${entityBreedItem}`].getRef(), 0)
     ); //won't cause a problem as the bread is obtained when the entity is constructed.
     this.wrapped.tasks.addTask(4, AITask("EntityAIFollowParent", 2)(this, 1.2));
     this.wrapped.tasks.addTask(5, AITask("EntityAIWander", 2)(this, 1.1));
@@ -428,13 +478,13 @@ export function registerEntityServer(
   };
 
   nme_OEntity.prototype.$getLivingSound = function (this: any) {
-    return ModAPI.util.str("mob." + entityID + ".quack");
+    return ModAPI.util.str("mob." + entityID + ".main_sound");
   };
   nme_OEntity.prototype.$getHurtSound = function (this: any) {
-    return ModAPI.util.str("mob." + entityID + ".quack");
+    return ModAPI.util.str("mob." + entityID + ".main_sound");
   };
   nme_OEntity.prototype.$getDeathSound = function (this: any) {
-    return ModAPI.util.str("mob." + entityID + ".quack");
+    return ModAPI.util.str("mob." + entityID + ".main_sound");
   };
   nme_OEntity.prototype.$playStepSound = function (this: any) {
     this.wrapped ||= ModAPI.util.wrap(this).getCorrective();
@@ -445,7 +495,7 @@ export function registerEntityServer(
     );
   };
   nme_OEntity.prototype.$getDropItem = function (this: any) {
-    return ModAPI.items.feather.getRef();
+    return ModAPI.items[`${entityDropItem}`].getRef();
   };
   nme_OEntity.prototype.$createChild = function (this: any, otherParent: any) {
     this.wrapped ||= ModAPI.util.wrap(this).getCorrective();
@@ -453,7 +503,7 @@ export function registerEntityServer(
   };
   nme_OEntity.prototype.$isBreedingItem = function (this: any, itemstack: any) {
     return (
-      itemstack !== null && itemstack.$getItem() === ModAPI.items.bread.getRef()
+      itemstack !== null && itemstack.$getItem() === ModAPI.items[`${entityBreedItem}`].getRef()
     );
   };
   // END CUSTOM ENTITY
@@ -506,7 +556,7 @@ export function registerEntityServer(
   };
 
   const ID = ModAPI.keygen.entity(entityID);
-  ModAPI.reflect
+  ModAPI.reflect8a
     .getClassById("net.minecraft.entity.EntityList")
     .staticMethods.addMapping0.method(
       ModAPI.util.asClass(nme_OEntity),
@@ -517,8 +567,8 @@ export function registerEntityServer(
       },
       ModAPI.util.str(entityName),
       ID,
-      0x5e3e2d, //egg base
-      0x269166 //egg spots
+      eggBase || 0x5e3e2d, //egg base
+      eggSpots || 0x269166 //egg spots
     );
 
   const SpawnPlacementType = ModAPI.reflect.getClassById(
@@ -604,7 +654,7 @@ export function OvenMDK__defineExecCmdAsGlobal(): void {
       const server = getServer
         ? getServer() // 1.8
         : ModAPI.reflect.getClassById("net.minecraft.server.MinecraftServer")
-            .staticVariables.server; // 1.12
+          .staticVariables.server; // 1.12
 
       if (!server) return;
       console.log(server);
@@ -622,9 +672,9 @@ export function OvenMDK__defineExecCmdAsGlobal(): void {
       const addChatMsg = $commandsender.$addChatMessage;
 
       if (!feedback) {
-        ModAPI.hooks.methods.nmc_CommandBase_notifyOperators0 = () => {};
-        ModAPI.hooks.methods.nmc_CommandBase_notifyOperators = () => {};
-        $commandsender.$addChatMessage = () => {};
+        ModAPI.hooks.methods.nmc_CommandBase_notifyOperators0 = () => { };
+        ModAPI.hooks.methods.nmc_CommandBase_notifyOperators = () => { };
+        $commandsender.$addChatMessage = () => { };
       }
 
       try {
