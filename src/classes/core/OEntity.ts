@@ -9,8 +9,8 @@ export default class OEntity {
   private entity_sound_main: string;
   private entityBreedItem: string;
   private entityDropItem: string;
-  private eggBase?: number;
-  private eggSpots?: number;
+  private eggBase: string;
+  private eggSpots: string;
   constructor(
     entityName: string,
     entityID: string,
@@ -19,13 +19,13 @@ export default class OEntity {
     entity_sound_main: string,
     entityBreedItem: string,
     entityDropItem: string,
-    eggBase?: number,
-    eggSpots?: number
+    eggBase: string,
+    eggSpots: string
   ) {
     this.entityName = entityName;
     this.entityID = entityID;
     this.entityTexture = entityTexture;
-    this.entityModel = entityMyodel;
+    this.entityModel = entityModel;
     this.entity_sound_main = entity_sound_main;
     this.entityBreedItem = entityBreedItem || "wheat"; //default breed item
     this.entityDropItem = entityDropItem || "feather"; //default drop item
@@ -73,10 +73,11 @@ export default class OEntity {
     const SharedMonsterAttributes = ModAPI.reflect.getClassByName(
       "SharedMonsterAttributes"
     ).staticVariables;
-
+    var entityBreedItem2: string = this.entityBreedItem;
+    var entityDropItem2: string = this.entityDropItem;
     // START CUSTOM ENTITY
-    let entitySize1 = 0.4; // Default size for most entities
-    let entitySize2 = 0.7;
+    let entitySize1: number; // Default size for most entities
+    let entitySize2: number;
 
     if (this.entityModel === "ModelChicken") {
       entitySize1 = 0.4; // Chicken
@@ -124,8 +125,7 @@ export default class OEntity {
       entitySize1 = 0.7; // Snow Golem
       entitySize2 = 1.9;
     }
-    var entityBreedItem = this.entityBreedItem;
-    var entityDropItem = this.entityDropItem;
+
     var entityClass = ModAPI.reflect.getClassById(
       "net.minecraft.entity.passive.EntityAnimal"
     );
@@ -133,21 +133,23 @@ export default class OEntity {
       entityClass,
       (x) => x.length === 2
     );
+    console.warn(
+      `this is entity size 1: ${entitySize1}, this is entity size 2: ${entitySize2}, oh the breeditem ${entityBreedItem2}, and dropItem ${entityDropItem2}`
+    );
+    var entityBreedItem2: string = this.entityBreedItem;
+    var entityDropItem2: string = this.entityDropItem;
+    var item_ref = ModAPI.items[entityBreedItem2];
     var nme_OEntity = function nme_OEntity($worldIn) {
       entitySuper(this, $worldIn);
       this.wrapped ||= ModAPI.util.wrap(this).getCorrective();
-      this.wrapped.setSize(entitySize1, entitySize2);
+
+      this.wrapped.setSize(entitySize1 || 0.4, entitySize2 || 0.7);
       this.wrapped.tasks.addTask(0, AITask("EntityAISwimming", 1)(this));
       this.wrapped.tasks.addTask(1, AITask("EntityAIPanic", 2)(this, 1.9));
       this.wrapped.tasks.addTask(2, AITask("EntityAIMate", 2)(this, 1.0));
       this.wrapped.tasks.addTask(
         3,
-        AITask("EntityAITempt", 4)(
-          this,
-          1.5,
-          ModAPI.items[`${entityBreedItem}`].getRef(),
-          0
-        )
+        AITask("EntityAITempt", 4)(this, 1.5, item_ref.getRef(), 0)
       ); //won't cause a problem as the bread is obtained when the entity is constructed.
       this.wrapped.tasks.addTask(
         4,
@@ -217,7 +219,7 @@ export default class OEntity {
       );
     };
     nme_OEntity.prototype.$getDropItem = function () {
-      return ModAPI.items[`${entityDropItem}`].getRef();
+      return ModAPI.items[entityDropItem2].getRef();
     };
     nme_OEntity.prototype.$createChild = function (otherParent) {
       this.wrapped ||= ModAPI.util.wrap(this).getCorrective();
@@ -226,7 +228,7 @@ export default class OEntity {
     nme_OEntity.prototype.$isBreedingItem = function (itemstack) {
       return (
         itemstack !== null &&
-        itemstack.$getItem() === ModAPI.items[`${entityBreedItem}`].getRef()
+        itemstack.$getItem() === ModAPI.items[entityBreedItem2].getRef()
       );
     };
     // END CUSTOM ENTITY
@@ -286,7 +288,7 @@ export default class OEntity {
             return new nme_OEntity($worldIn);
           },
         },
-        ModAPI.util.str(this.entityName),
+        ModAPI.util.str(this.entityID.toUpperCase()),
         ID,
         this.eggBase || 0x5e3e2d, //egg base
         this.eggSpots || 0x269166 //egg spots
@@ -345,13 +347,16 @@ export default class OEntity {
     });
 
     ModAPI.addEventListener("lib:asyncsink", async () => {
-      AsyncSink.L10N.set(`entity.${this.entityName}.name`, this.entityName);
+      AsyncSink.L10N.set(
+        `entity.${this.entityID.toUpperCase()}.name`,
+        this.entityName
+      );
     });
 
     return {
-      [`Entity${this.entityID}`]: nme_OEntity,
-      [`Model${this.entityID}`]: nmcm_OEntityModel,
-      [`Render${this.entityID}`]: nmcre_RenderOEntity,
+      [`Entity${this.entityID.toUpperCase()}`]: nme_OEntity,
+      [`Model${this.entityID.toUpperCase()}`]: nmcm_OEntityModel,
+      [`Render${this.entityID.toUpperCase()}`]: nmcre_RenderOEntity,
       [`${this.entityID}Textures`]: duckTextures,
     };
   }
@@ -411,10 +416,10 @@ export default class OEntity {
       );
 
       ModAPI.mc.renderManager.entityRenderMap.put(
-        ModAPI.util.asClass(data[`Entity${this.entityID}`]),
-        new data[`Render${this.entityID}`](
+        ModAPI.util.asClass(data[`Entity${this.entityID.toUpperCase()}`]),
+        new data[`Render${this.entityID.toUpperCase()}`](
           ModAPI.mc.renderManager.getRef(),
-          new data[`Model${this.entityID}`](),
+          new data[`Model${this.entityID.toUpperCase()}`](),
           0.3
         )
       );
