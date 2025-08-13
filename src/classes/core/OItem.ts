@@ -42,7 +42,7 @@ export default class OItem {
     itemStack: number,
     texture: string,
     onRightClick: ($itemstack: any, $world: any, $player: any) => void,
-    onItemUse?: (
+    onItemUse: (
       $itemstack: any,
       $world: any,
       $player: any,
@@ -56,7 +56,7 @@ export default class OItem {
     this.onRightClick = onRightClick;
 
     // Assign optional onItemUse if provided
-    if (onItemUse) this.onItemUse = onItemUse;
+    this.onItemUse = onItemUse;
   }
 
   public registerClient(): void {
@@ -97,9 +97,12 @@ export default class OItem {
       ): void {
         if (!ModAPI.is_1_12) ($$player).$setItemInUse($$itemstack, 32);
         var $$itemstack, $$world, $$player;
+
         self.onRightClick($$itemstack, $$world, $$player);
-        console.log(`client itemstack:`);
-        console.log($$itemstack);
+        if (globalThis.Debug_mode) {
+          console.log(`client itemstack:`);
+          console.log($$itemstack);
+        }
         return ($$itemstack);
       }
     };
@@ -113,8 +116,10 @@ export default class OItem {
 
         var $$itemstack, $$world, $$player;
         self.onRightClick($$itemstack, $$world, $$player);
-        console.log(`client itemstack:`);
-        console.log($$itemstack);
+        if (globalThis.Debug_mode) {
+          console.log(`client itemstack:`);
+          console.log($$itemstack);
+        }
         return ($$ActionResult($$ResultEnum.SUCCESS, $$itemstack));
       }
     }
@@ -126,9 +131,11 @@ export default class OItem {
         $$blockpos: any,
       ) {
         var $$itemstack, $$world, $$player, $$blockpos;
-        self.onItemUse($$itemstack, $$world, $$player, $$blockpos);
-        console.log(`client itemstack:`);
-        console.log($$itemstack);
+        if (self.onItemUse) { self.onItemUse($$itemstack, $$world, $$player, $$blockpos) };
+        if (globalThis.Debug_mode) {
+          console.log(`client itemstack:`);
+          console.log($$itemstack);
+        }
         return 0;
       }
     };
@@ -136,7 +143,7 @@ export default class OItem {
       var $$ResultEnum = ModAPI.reflect.getClassByName("EnumActionResult").staticVariables;
       nmi_OvenItem.prototype.$onItemUse = function ($$itemstack, $$player, $$world, $$blockpos) {
         var $$itemstack, $$player, $$world, $$blockpos;
-        if (self.onItemUse) {self.onItemUse($$itemstack, $$world, $$player, $$blockpos);}
+        if (self.onItemUse) { self.onItemUse($$itemstack, $$world, $$player, $$blockpos) };
         return $$ResultEnum.PASS;
       }
     }
@@ -192,37 +199,49 @@ export default class OItem {
 
     const self = this;
     var custom_item = new OItem(this.itemName, this.itemID, this.itemStack, this.itemTexture, this.onRightClick, this.onItemUse).registerClient();
-    ModAPI.dedicatedServer.appendCode(`globalThis.registerServerItem("${this.itemID}", ${this.itemStack}, ${this.onRightClick}, ${this.onItemUse});`);
     if (ModAPI.is_1_12) {
+      ModAPI.dedicatedServer.appendCode(`globalThis.registerServerItem("${this.itemID}", ${this.itemStack}, ${this.onRightClick}, ${this.onItemUse});`);
       ModAPI.addEventListener("lib:asyncsink", async () => {
         ModAPI.addEventListener(
           "lib:asyncsink:registeritems",
           (renderItem: any) => {
-            renderItem.registerItem(custom_item, ModAPI.util.str(`${self.itemID}`));
+            console.log("cool reg for");
+            console.log(self.itemID);
+            renderItem.registerItem(custom_item, ModAPI.util.str(self.itemID));
           }
         );
+        if (globalThis.Debug_mode) {
+          console.log(`registering ${self.itemID}`);
+        }
 
-        AsyncSink.L10N.set(`item.${self.itemID}.name`, `${self.itemName}`);
-
+        AsyncSink.L10N.set(`item.${self.itemID}.name`, self.itemName);
         AsyncSink.setFile(`resourcepacks/AsyncSinkLib/assets/minecraft/models/item/${self.itemID}.json`, JSON.stringify(
           {
-            "parent": "item/generated",
+            "parent": "builtin/generated",
             "textures": {
-              "layer0": `items/${this.itemID}`
-            }
+              "layer0": `items/${self.itemID}`
+            },
+            "display": { "thirdperson_righthand": { "rotation": [0, -90, 55], "translation": [0, 4, 0.5], "scale": [0.85, 0.85, 0.85] }, "thirdperson_lefthand": { "rotation": [0, 90, -55], "translation": [0, 4, 0.5], "scale": [0.85, 0.85, 0.85] }, "firstperson_righthand": { "rotation": [0, -90, 25], "translation": [1.13, 3.2, 1.13], "scale": [0.68, 0.68, 0.68] }, "firstperson_lefthand": { "rotation": [0, 90, -25], "translation": [1.13, 3.2, 1.13], "scale": [0.68, 0.68, 0.68] } }
+
           }
         ));
-
+        function arrayBufferToString(buffer: ArrayBuffer, encoding: string = 'utf-8'): string {
+          const decoder = new TextDecoder(encoding);
+          return decoder.decode(buffer);
+        }
+        console.log(await (arrayBufferToString(AsyncSink.getFile(`resourcepacks/AsyncSinkLib/assets/minecraft/models/item/${self.itemID}.json`))))
         const response = await fetch(self.itemTexture);
         const buffer = await response.arrayBuffer();
 
         AsyncSink.setFile(
-          "resourcepacks/AsyncSinkLib/assets/minecraft/textures/items/" + self.itemID + ".png",
+          `resourcepacks/AsyncSinkLib/assets/minecraft/textures/items/${self.itemID}.png`,
           buffer
         );
+
       });
     }
     if (!ModAPI.is_1_12) {
+      ModAPI.dedicatedServer.appendCode(`globalThis.registerServerItem("${this.itemID}", ${this.itemStack}, ${this.onRightClick}, ${this.onItemUse});`);
       ModAPI.addEventListener("lib:asyncsink", async () => {
         ModAPI.addEventListener(
           "lib:asyncsink:registeritems",
@@ -271,5 +290,6 @@ export default class OItem {
         );
       });
     }
+    return;
   }
 }

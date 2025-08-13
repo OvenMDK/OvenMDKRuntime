@@ -9,8 +9,9 @@ export default class OEntity {
   private entity_sound_main: string;
   private entityBreedItem: string;
   private entityDropItem: string;
-  private eggBase: string;
-  private eggSpots: string;
+  private eggBase: any;
+  private eggSpots: any;
+  private extra_tasks: any[];
   constructor(
     entityName: string,
     entityID: string,
@@ -19,8 +20,9 @@ export default class OEntity {
     entity_sound_main: string,
     entityBreedItem: string,
     entityDropItem: string,
-    eggBase: string,
-    eggSpots: string
+    eggBase: any,
+    eggSpots: any,
+    extra_tasks: any[]
   ) {
     this.entityName = entityName;
     this.entityID = entityID;
@@ -31,6 +33,7 @@ export default class OEntity {
     this.entityDropItem = entityDropItem || "feather"; //default drop item
     this.eggBase = eggBase || 0x5e3e2d; //default egg base color
     this.eggSpots = eggSpots || 0x269166; //default egg spots color
+    this.extra_tasks = extra_tasks;
   }
   private async waitForRenderManager() {
     return new Promise((res: any, rej: any) => {
@@ -46,12 +49,7 @@ export default class OEntity {
   }
 
   private registerEntityClient() {
-    if (ModAPI.is_1_12) {
-      throw new Error(
-        "OEntity does not support 1.12, please use 1.8.8 for full support"
-      );
-    }
-    console.warn("entities are not finished yet! Use at your own risk!");
+    console.warn("OEntitys are still in development, expect bugs and issues");
     //return;
     ModAPI.hooks.methods.jl_String_format =
       ModAPI.hooks.methods.nlev_HString_format; //temporary thing to fix an issue in eaglercraft
@@ -133,12 +131,15 @@ export default class OEntity {
       entityClass,
       (x) => x.length === 2
     );
-    console.warn(
-      `this is entity size 1: ${entitySize1}, this is entity size 2: ${entitySize2}, oh the breeditem ${entityBreedItem2}, and dropItem ${entityDropItem2}`
-    );
+    if (globalThis.Debug_mode) {
+      console.warn(
+        `this is entity size 1: ${entitySize1}, this is entity size 2: ${entitySize2}, oh the breeditem ${entityBreedItem2}, and dropItem ${entityDropItem2}`
+      );
+    };
     var entityBreedItem2: string = this.entityBreedItem;
     var entityDropItem2: string = this.entityDropItem;
-    var item_ref = ModAPI.items[entityBreedItem2];
+    var item_ref = ModAPI.items[entityBreedItem2].getRef();
+    var extra_tasks = this.extra_tasks || [];
     var nme_OEntity = function nme_OEntity($worldIn) {
       entitySuper(this, $worldIn);
       this.wrapped ||= ModAPI.util.wrap(this).getCorrective();
@@ -147,10 +148,20 @@ export default class OEntity {
       this.wrapped.tasks.addTask(0, AITask("EntityAISwimming", 1)(this));
       this.wrapped.tasks.addTask(1, AITask("EntityAIPanic", 2)(this, 1.9));
       this.wrapped.tasks.addTask(2, AITask("EntityAIMate", 2)(this, 1.0));
-      this.wrapped.tasks.addTask(
-        3,
-        AITask("EntityAITempt", 4)(this, 1.5, item_ref.getRef(), 0)
-      ); //won't cause a problem as the bread is obtained when the entity is constructed.
+      try {
+        this.wrapped.tasks.addTask(
+          3,
+          AITask("EntityAITempt", 4)(this, 1.5, item_ref, 0)
+        );
+      } catch (e) {
+        console.warn(
+          `Failed to add EntityAITempt task for ${this.entityID}. This may be due to an incorrect item reference, ${item_ref}, ( item ref), and ${item_ref()}, (item_ref())`
+        );
+        this.wrapped.tasks.addTask(
+          3,
+          AITask("EntityAITempt", 4)(this, 1.5, item_ref(), 0)
+        );
+      };
       this.wrapped.tasks.addTask(
         4,
         AITask("EntityAIFollowParent", 2)(this, 1.2)
@@ -165,6 +176,15 @@ export default class OEntity {
         )
       );
       this.wrapped.tasks.addTask(7, AITask("EntityAILookIdle", 1)(this));
+      extra_tasks.forEach(element => {
+        try {
+          element(this);
+        } catch (e) {
+          console.warn(
+            `Failed to add extra task for ${this.entityID}. This may be due to an incorrect task function, ${element}, or the task function not being compatible with the entity.`
+          );
+        }
+      });
     };
     ModAPI.reflect.prototypeStack(entityClass, nme_OEntity);
     nme_OEntity.prototype.$getEyeHeight = function () {
@@ -219,12 +239,13 @@ export default class OEntity {
       );
     };
     nme_OEntity.prototype.$getDropItem = function () {
-      return ModAPI.items[entityDropItem2].getRef();
+      return ModAPI.items[this.entityDropItem].getRef();
     };
     nme_OEntity.prototype.$createChild = function (otherParent) {
       this.wrapped ||= ModAPI.util.wrap(this).getCorrective();
       return new nme_OEntity(this.wrapped.worldObj?.getRef() ?? null);
     };
+
     nme_OEntity.prototype.$isBreedingItem = function (itemstack) {
       return (
         itemstack !== null &&
@@ -362,8 +383,11 @@ export default class OEntity {
   }
 
   private registerOEntity() {
+    if (ModAPI.is_1_12) {
+      return console.warn("OEntitys dont work in 1.12, and one of your mods are trying to use it! Please switch to 1.8.8")
+    }
     ModAPI.dedicatedServer.appendCode(
-      `globalThis.registerEntityServer("${this.entityID}", "${this.entityName}", "${this.entityModel}", ${this.eggBase}, ${this.eggSpots});`
+      `globalThis.registerEntityServer("${this.entityID}", "${this.entityName}", "${this.entityModel}", "${this.entityBreedItem}", "${this.entityDropItem}", ${this.eggBase}, ${this.eggSpots});`
     );
     var data = this.registerEntityClient();
 
@@ -444,7 +468,7 @@ export default class OEntity {
       `spawnegg_${this.entityID}`,
       64,
       texture,
-      () => {},
+      () => { },
       ($$itemstack, $$world, $$player, $$blockpos) => {
         console.log($$blockpos);
         var spawn_x = $$blockpos.$x;

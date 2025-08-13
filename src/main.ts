@@ -46,6 +46,7 @@ import OBlock from "classes/core/OBlock";
 import { simplecommand } from "classes/core/commands";
 import OEntity from "./classes/core/OEntity";
 import OvenOre from "classes/core/OvenOre";
+import { ORecipe } from "classes/core/ORecipe";
 const devmode = true;
 ModAPI.events.newEvent("lib:OvenMDK:load");
 ModAPI.events.newEvent("lib:OvenMDK:loaded");
@@ -63,6 +64,7 @@ ModAPI.addEventListener("lib:OvenMDK:load", () => {
   globalThis.OvenOre = OvenOre;
   globalThis.registerOvenOreServer = registerOvenOreServer;
   globalThis.OEntity = OEntity;
+  globalThis.ORecipe = ORecipe;
   if (ModAPI.is_1_12) {
     if (!devmode) {
       alert(
@@ -83,6 +85,10 @@ ModAPI.addEventListener("lib:OvenMDK:load", () => {
     `globalThis.registerOvenOreServer = ${registerOvenOreServer};`
   );
   console.log("Register Oven Ore serverside function loaded");
+  ModAPI.dedicatedServer.appendCode(
+        `globalThis.registerServerORecipe = ${ORecipe};`
+    );
+  console.log("Register ORecipe serverside function loaded");
   ModAPI.dedicatedServer.appendCode(OvenMDK__defineExecCmdAsGlobal);
   OvenMDK__defineExecCmdAsGlobal();
   console.log(
@@ -98,7 +104,7 @@ ModAPI.addEventListener("lib:OvenMDK:load", () => {
   console.log("Register Block serverside function loaded");
   ModAPI.events.callEvent("lib:OvenMDK:loaded", {});
 });
-ModAPI.addEventListener("lib:OvenMDK:loaded", (version) => {
+ModAPI.addEventListener("lib:OvenMDK:loaded", (e) => {
   console.log("OvenMDK Runtime has finished loading");
   console.log(`
     ┌───────────────────────────────────┐
@@ -109,7 +115,7 @@ ModAPI.addEventListener("lib:OvenMDK:loaded", (version) => {
     │                                   │
     │   A mod dev kit for starters      │
     │                                   │
-    │   Version: ${version}                   │
+    │   Version: ${e.version}                   │
     │                                   │
     └───────────────────────────────────┘
     `);
@@ -135,10 +141,12 @@ ModAPI.addEventListener("lib:OvenMDK:loaded", (version) => {
   simplecommand("/ovenmdk", " log_3", () => {
     ModAPI.displayToChat(`
       OvenMDK Runtime v0.3
-      Made by BendieGames and Block_2222
+      Made by BendieGames
       - Added more OEntity customization
         - Added more support for Model hitboexes
-        - Added custom entity sound support`)
+        - Added custom entity sound support
+        - Added custom crafting recipes
+        - Attempted to fix items textures on 1.12 with no success`)
   });
 });
 ModAPI.addCredit(

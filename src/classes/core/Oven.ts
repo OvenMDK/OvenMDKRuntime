@@ -32,12 +32,10 @@ export default class Oven {
     ModAPI.meta.description(modClass.description);
     ModAPI.meta.credits(modClass.credits);
     ModAPI.meta.icon(modClass.icon);
-    ModAPI.meta.config(modClass.config());
-    modClass.init();
+    ModAPI.meta.config(modClass.config);
     globalThis.Debug_mode = modClass.Debug_mode;
-    /*if (modClass.only_1_12_2 === true) {
-      // Ill do some more stuff later
-    }*/
+    ModAPI.dedicatedServer.appendCode(`globalThis.Debug_mode = ${modClass.Debug_mode};`);
+    modClass.init();
     this.mods.push(modClass);
   }
 

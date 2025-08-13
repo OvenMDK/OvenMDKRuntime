@@ -14,9 +14,9 @@ declare const OvenMDK__executeCommandAs: any;
  * @see {@link https://eaglerforge.github.io/EaglerForgeInjector/docs/apidoc/reflect.html} Reflect Documentation
  */
 declare interface ReflectMethod {
-  methodName: string;
-  methodNameShord: string;
-  method: (...args: any[]) => any;
+    methodName: any;
+    methodNameShort: string;
+    method: (...args: any[]) => any;
 }
 
 /**
@@ -24,22 +24,23 @@ declare interface ReflectMethod {
  * @see {@link https://eaglerforge.github.io/EaglerForgeInjector/docs/apidoc/reflect.html} Reflect Documentation
  */
 declare interface ReflectClass {
-  binaryName: string | null;
-  class: any | null;
-  compiledName: string;
-  constructors: Function[];
-  hasMeta: boolean;
-  id: string | null;
-  name: string;
-  methods: Map<string, ReflectMethod>;
-  staticMethods: Record<string, ReflectMethod>;
-  staticVariableNames: string[];
-  staticVariables: Record<string, any>;
-  superclass?: ReflectClass;
+    binaryName: string | null;
+    class: any | null;
+    compiledName: string;
+    constructors: Function[];
+    hasMeta: boolean;
+    id: string | null;
+    name: string;
+    methods: Record<string, ReflectMethod>;
+    staticMethods: Record<string, ReflectMethod>;
+    staticVariableNames: string[];
+    staticVariables: Record<string, any>;
+    superclass?: ReflectClass;
 
-  instanceOf(obj: any): boolean;
-  getConstructorByArgs(...args: string[]): Function;
+    instanceOf(obj: any): boolean;
+    getConstructorByArgs(...args: string[]): Function;
 }
+
 
 /**
  * The EaglerForge ModAPI is housed in a global JavaScript object stored on globalThis, called ModAPI or PluginAPI. (both are identical)
@@ -727,7 +728,7 @@ declare namespace ModAPI {
      */
     function getSuper(
       rClass: ReflectClass,
-      filter: (fn: Function) => boolean
+      filter?: (fn: Function) => boolean
     ): Function;
 
     /**
@@ -989,7 +990,7 @@ declare namespace ModAPI {
      * @param {JavaObject} obj
      * @see {@link https://eaglerforge.github.io/EaglerForgeInjector/docs/apidoc/utils.html} Util Documentation
      */
-    function wrap(obj: any): object;
+    function wrap<T = any>(obj: any): T;
   }
 
   /**
