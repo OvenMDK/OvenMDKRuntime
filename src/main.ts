@@ -145,7 +145,7 @@ ModAPI.addEventListener("lib:OvenMDK:loaded", (e) => {
       - Added more OEntity customization
         - Added more support for Model hitboexes
         - Added custom entity sound support
-        - Added custom crafting recipes
+        - Added custom crafting recipes ( Broken in 1.12)
         - Attempted to fix items textures on 1.12 with no success`)
   });
 });
