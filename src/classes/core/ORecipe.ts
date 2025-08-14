@@ -96,12 +96,15 @@ export function ORecipe(
     resultItem: string
 ) {
     const patternString = `${A},${B},${C},${D},${E},${F},${G},${H},${I}`;
-
-    if (!ModAPI.server) {
-        ModAPI.dedicatedServer.appendCode(
-            `globalThis.registerServerORecipe("${patternString}", "${resultItem}");`
-        );
-    }
-    globalThis.registerOvenMDKRecipe(patternString, resultItem);
+    if (ModAPI.is_1_12) {
+        console.warn("ORecipes do not work in 1.12.2 please use 1.8 for ORecipes!")
+    } else {
+        if (!ModAPI.server) {
+            ModAPI.dedicatedServer.appendCode(
+                `globalThis.registerServerORecipe("${patternString}", "${resultItem}");`
+            );
+        }
+        globalThis.registerOvenMDKRecipe(patternString, resultItem);
+    };
 }
 
