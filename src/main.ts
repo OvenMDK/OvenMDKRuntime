@@ -46,7 +46,8 @@ import OBlock from "classes/core/OBlock";
 import { simplecommand } from "classes/core/commands";
 import OEntity from "./classes/core/OEntity";
 import OvenOre from "classes/core/OvenOre";
-import { ORecipe } from "classes/core/ORecipe";
+import { ORecipe, registerOvenMDKRecipe } from "classes/core/ORecipe";
+
 const devmode = true;
 ModAPI.events.newEvent("lib:OvenMDK:load");
 ModAPI.events.newEvent("lib:OvenMDK:loaded");
@@ -65,6 +66,7 @@ ModAPI.addEventListener("lib:OvenMDK:load", () => {
   globalThis.registerOvenOreServer = registerOvenOreServer;
   globalThis.OEntity = OEntity;
   globalThis.ORecipe = ORecipe;
+  globalThis.registerOvenMDKRecipe = registerOvenMDKRecipe;
   if (ModAPI.is_1_12) {
     if (!devmode) {
       alert(
@@ -86,7 +88,7 @@ ModAPI.addEventListener("lib:OvenMDK:load", () => {
   );
   console.log("Register Oven Ore serverside function loaded");
   ModAPI.dedicatedServer.appendCode(
-        `globalThis.registerServerORecipe = ${ORecipe};`
+        `globalThis.registerServerORecipe = ${registerOvenMDKRecipe};`
     );
   console.log("Register ORecipe serverside function loaded");
   ModAPI.dedicatedServer.appendCode(OvenMDK__defineExecCmdAsGlobal);
@@ -145,7 +147,7 @@ ModAPI.addEventListener("lib:OvenMDK:loaded", (e) => {
       - Added more OEntity customization
         - Added more support for Model hitboexes
         - Added custom entity sound support
-        - Added custom crafting recipes ( Broken in 1.12)
+        - Added custom crafting recipes however they are not finished yet ( Broken in 1.12)
         - Attempted to fix items textures on 1.12 with no success`)
   });
 });
