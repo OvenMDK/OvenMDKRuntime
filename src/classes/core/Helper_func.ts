@@ -217,6 +217,8 @@ export function registerServerBlock(
 ) {
   const BlockClass = ModAPI.reflect.getClassById("net.minecraft.block.Block");
   const ItemClass = ModAPI.reflect.getClassById("net.minecraft.item.Item");
+  var getDroppedItem = BlockClass.methods.getItemDropped.method;
+  var quantityDropped = BlockClass.methods.quantityDropped.method;
   let creativeTab: any;
   if (ModAPI.is_1_12) {
     creativeTab = ModAPI.reflect.getClassById(
@@ -252,6 +254,16 @@ export function registerServerBlock(
     //onBreak($world, $blockpos, $blockstate);
     return breakBlockMethod(this, $world, $blockpos, $blockstate);
   };
+  nmb_Oblock.prototype.$getItemDropped = function ($$blockstate, $$random, __efb2_arg_forture) {
+    var __efb2_arg_forture;
+    return getDroppedItem(this, $$blockstate, $$random, __efb2_arg_forture);
+  }
+  var $$onBlockDestroyedByPlayerMethod = BlockClass.methods.onBlockDestroyedByPlayer.method;
+  nmb_Oblock.prototype.$onBlockDestroyedByPlayer = function ($$world, $$blockpos, $$blockstate) {
+    var $$world, $$blockpos, $$blockstate;
+    onBreak.call($$world, $$blockpos, $$blockstate)
+    return $$onBlockDestroyedByPlayerMethod(this, $$world, $$blockpos, $$blockstate);
+  }
   function fixupBlockIds() {
     const blockRegistry = ModAPI.util
       .wrap(
@@ -965,7 +977,7 @@ export function registerOvenOreServer(
     $blockpos
   ) {
     if (!$this.$currentWorld) {
-      $this[`$OvenMDK__advanced_block0_483495_BlockGen`] = WorldGenMineable(
+      $this[`$OvenMDK__${Date.now()}_BlockGen`] = WorldGenMineable(
         ModAPI.blocks[`${block_ID}`].getStateFromMeta(0).getRef(),
         vienSize
       );
@@ -987,7 +999,7 @@ export function registerOvenOreServer(
   ModAPI.hooks.methods[BiomeDecorator_generateOres] = function ($this) {
     $this.$genStandardOre1(
       vienCount,
-      $this[`$OvenMDK__advanced_block0_483495_BlockGen`] || null,
+      $this[`$OvenMDK__${Date.now()}_BlockGen`] || null,
       minGenerationHeight,
       maxGenerationHeight
     );
