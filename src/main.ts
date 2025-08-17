@@ -46,7 +46,7 @@ import OBlock from "classes/core/OBlock";
 import { simplecommand } from "classes/core/commands";
 import OEntity from "./classes/core/OEntity";
 import OvenOre from "classes/core/OvenOre";
-import { ORecipe, registerOvenMDKRecipe } from "classes/core/ORecipe";
+import { ORecipe, registerOvenMDKRecipe, OFurnanceRecipe, registerOvenMDKFurnaceRecipe } from "classes/core/ORecipe";
 
 const devmode = true;
 ModAPI.events.newEvent("lib:OvenMDK:load");
@@ -67,6 +67,8 @@ ModAPI.addEventListener("lib:OvenMDK:load", () => {
   globalThis.OEntity = OEntity;
   globalThis.ORecipe = ORecipe;
   globalThis.registerOvenMDKRecipe = registerOvenMDKRecipe;
+  globalThis.OFurnanceRecipe = OFurnanceRecipe;
+  globalThis.registerOvenMDKFurnaceRecipe = registerOvenMDKFurnaceRecipe;
   if (ModAPI.is_1_12) {
     if (!devmode) {
       alert(
@@ -91,6 +93,10 @@ ModAPI.addEventListener("lib:OvenMDK:load", () => {
         `globalThis.registerServerORecipe = ${registerOvenMDKRecipe};`
     );
   console.log("Register ORecipe serverside function loaded");
+  ModAPI.dedicatedServer.appendCode(
+        `globalThis.registerServerOFurnanceRecipe = ${registerOvenMDKFurnaceRecipe};`
+    );
+  console.log("Register OFurnanceRecipe serverside function loaded");
   ModAPI.dedicatedServer.appendCode(OvenMDK__defineExecCmdAsGlobal);
   OvenMDK__defineExecCmdAsGlobal();
   console.log(
@@ -104,9 +110,9 @@ ModAPI.addEventListener("lib:OvenMDK:load", () => {
     `globalThis.registerEntityServer = ${registerEntityServer};`
   );
   console.log("Register Block serverside function loaded");
-  ModAPI.events.callEvent("lib:OvenMDK:loaded", {});
+  ModAPI.events.callEvent("lib:OvenMDK:loaded", { version: "v0.4" });
 });
-ModAPI.addEventListener("lib:OvenMDK:loaded", (e) => {
+ModAPI.addEventListener("lib:OvenMDK:loaded", (event: any) => {
   console.log("OvenMDK Runtime has finished loading");
   console.log(`
     ┌───────────────────────────────────┐
@@ -117,7 +123,7 @@ ModAPI.addEventListener("lib:OvenMDK:loaded", (e) => {
     │                                   │
     │   A mod dev kit for starters      │
     │                                   │
-    │   Version: ${e.version}                   │
+    │   Version: ${event.version}                   │
     │                                   │
     └───────────────────────────────────┘
     `);
@@ -157,4 +163,4 @@ ModAPI.addCredit(
   " - Made OvenMDK\n - Coded most of OvenMDK"
 );
 ModAPI.addCredit("OvenMDK Runtime", "Block_2222", " - Founded OvenMDK");
-ModAPI.events.callEvent("lib:OvenMDK:load", { version: "v0.3" });
+ModAPI.events.callEvent("lib:OvenMDK:load", {});

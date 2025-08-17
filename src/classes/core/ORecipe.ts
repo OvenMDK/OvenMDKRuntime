@@ -107,4 +107,85 @@ export function ORecipe(
         globalThis.registerOvenMDKRecipe(patternString, resultItem);
     };
 }
+export function registerOvenMDKFurnaceRecipe(input_item: string, resultItem: string, experience: number) {
+    function $$internalRegister() {
+        const $$itemStackFromBlockWithMeta =
+            ModAPI.reflect.getClassById("net.minecraft.item.ItemStack").constructors[2];
+        const $$itemStackFromItem =
+            ModAPI.reflect.getClassById("net.minecraft.item.ItemStack").constructors[4];
 
+        const parseEntry = (entry: string) => {
+            let type: "block" | "item";
+            let id = entry;
+            let meta = 0;
+
+            if (id.includes("@")) {
+                const parts = id.split("@");
+                id = parts[0];
+                meta = parseInt(parts[1], 10) || 0;
+            }
+            if (id.startsWith("block/")) {
+                type = "block";
+                id = id.replace("block/", "");
+            } else if (id.startsWith("item/")) {
+                type = "item";
+                id = id.replace("item/", "");
+            } else {
+                if (ModAPI.blocks[id]) {
+                    type = "block";
+                } else if (ModAPI.items[id]) {
+                    type = "item";
+                } else {
+                    throw new Error(`Unknown item/block id: ${entry}`);
+                }
+            }
+
+            return { type, id, meta };
+        };
+
+        const input = parseEntry(input_item);
+        const output = parseEntry(resultItem);
+
+        const $$inputStack = (input.type === "block")
+            ? $$itemStackFromBlockWithMeta(ModAPI.blocks[input.id].getRef(), 1, input.meta)
+            : $$itemStackFromItem(ModAPI.items[input.id].getRef(), 1, input.meta || 0);
+
+        const $$outputStack = (output.type === "block")
+            ? $$itemStackFromBlockWithMeta(ModAPI.blocks[output.id].getRef(), 1, output.meta)
+            : $$itemStackFromItem(ModAPI.items[output.id].getRef(), 1, output.meta || 0);
+
+        const $$furnaceRecipes =
+            ModAPI.reflect.getClassById("net.minecraft.item.crafting.FurnaceRecipes")
+                .staticMethods.instance.method();
+
+        ModAPI.hooks.methods.nmic_FurnaceRecipes_addSmelting(
+            $$furnaceRecipes,
+            $$inputStack,
+            $$outputStack,
+            experience
+        );
+    }
+
+    if (ModAPI.items) {
+        $$internalRegister();
+    } else {
+        ModAPI.addEventListener("bootstrap", $$internalRegister);
+    }
+}
+
+export function OFurnanceRecipe(
+    input_item: string,
+    resultItem: string,
+    experience: number
+) {
+    if (ModAPI.is_1_12) {
+        console.warn("OFurnaceRecipes do not work in 1.12.2 please use 1.8 for OFurnaceRecipes!")
+    } else {
+        if (!ModAPI.server) {
+            ModAPI.dedicatedServer.appendCode(
+                `globalThis.registerServerORecipe("${input_item}", "${resultItem}", ${experience});`
+            );
+        }
+        globalThis.registerOvenMDKFurnaceRecipe(input_item, resultItem, experience);
+    };
+}

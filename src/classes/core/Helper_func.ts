@@ -978,7 +978,7 @@ export function registerOvenOreServer(
       $blockpos,
     ]);
   };
-
+  console.log("Cool register " + block_ID)
   const BiomeDecorator_generateOres = ModAPI.util.getMethodFromPackage(
     "net.minecraft.world.biome.BiomeDecorator",
     "generateOres"
