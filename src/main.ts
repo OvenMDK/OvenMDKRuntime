@@ -162,7 +162,8 @@ ModAPI.addEventListener("lib:OvenMDK:loaded", (event: any) => {
       Made by BendieGames
       - Added custom Block drops
       - Added better handling for ore generation
-      - Added custom Furnace recipes`)
+      - Added custom Furnace recipes
+      - Added custom models for blocks, entities, and items`)
   });
 });
 ModAPI.addCredit(
