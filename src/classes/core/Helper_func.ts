@@ -213,7 +213,8 @@ export function registerServerItem(
 }
 export function registerServerBlock(
   blockID: string,
-  onBreak: ($world: any, $blockpos: any, $blockstate: any) => void
+  onBreak: ($world: any, $blockpos: any, $blockstate: any) => void,
+  droppedItem: string
 ) {
   const BlockClass = ModAPI.reflect.getClassById("net.minecraft.block.Block");
   const ItemClass = ModAPI.reflect.getClassById("net.minecraft.item.Item");
@@ -256,7 +257,7 @@ export function registerServerBlock(
   };
   nmb_Oblock.prototype.$getItemDropped = function ($$blockstate, $$random, __efb2_arg_forture) {
     var __efb2_arg_forture;
-    return getDroppedItem(this, $$blockstate, $$random, __efb2_arg_forture);
+    return ModAPI.items[droppedItem].getRef();
   }
   var $$onBlockDestroyedByPlayerMethod = BlockClass.methods.onBlockDestroyedByPlayer.method;
   nmb_Oblock.prototype.$onBlockDestroyedByPlayer = function ($$world, $$blockpos, $$blockstate) {
@@ -327,7 +328,11 @@ export function registerServerBlock(
   };
   if (!ModAPI.is_1_12) {
     if (ModAPI.materials) {
-      return internalRegister();
+      if (ModAPI.items[droppedItem]) {
+        return internalRegister();
+      } else {
+        ModAPI.addEventListener("bootstrap", internalRegister);
+      }
     } else {
       ModAPI.addEventListener("bootstrap", internalRegister);
     }
@@ -977,7 +982,7 @@ export function registerOvenOreServer(
     $blockpos
   ) {
     if (!$this.$currentWorld) {
-      $this[`$OvenMDK__${Date.now()}_BlockGen`] = WorldGenMineable(
+      $this[`$OvenMDK__${block_ID}_BlockGen`] = WorldGenMineable(
         ModAPI.blocks[`${block_ID}`].getStateFromMeta(0).getRef(),
         vienSize
       );
@@ -999,7 +1004,7 @@ export function registerOvenOreServer(
   ModAPI.hooks.methods[BiomeDecorator_generateOres] = function ($this) {
     $this.$genStandardOre1(
       vienCount,
-      $this[`$OvenMDK__${Date.now()}_BlockGen`] || null,
+      $this[`$OvenMDK__${block_ID}_BlockGen`] || null,
       minGenerationHeight,
       maxGenerationHeight
     );

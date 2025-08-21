@@ -156,6 +156,14 @@ ModAPI.addEventListener("lib:OvenMDK:loaded", (event: any) => {
         - Added custom crafting recipes however they are not finished yet ( Broken in 1.12)
         - Attempted to fix items textures on 1.12 with no success`)
   });
+  simplecommand("/ovenmdk", " log_4", () => {
+    ModAPI.displayToChat(`
+      OvenMDK Runtime v0.4
+      Made by BendieGames
+      - Added custom Block drops
+      - Added better handling for ore generation
+      - Added custom Furnace recipes`)
+  });
 });
 ModAPI.addCredit(
   "OvenMDK Runtime",

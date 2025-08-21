@@ -26,16 +26,19 @@ export default class OBlock {
   private blockID: string;
   private blockInstance: any;
   private onBreak: (world: any, pos: any, state: any) => void;
+  private droppedItem: string;
   constructor(
     blockName: string,
     blockID: string,
     texture: string,
-    onBreak: (world: any, pos: any, state: any) => void
+    onBreak: (world: any, pos: any, state: any) => void,
+    droppedItem: string
   ) {
     this.blockName = blockName;
     this.blockID = blockID;
     this.blockTexture = texture;
     this.onBreak = onBreak;
+    this.droppedItem = droppedItem || blockID;
   }
 
   public register(): any {
@@ -87,7 +90,7 @@ export default class OBlock {
     }
     nmb_Oblock.prototype.$getItemDropped = function ($$blockstate, $$random, __efb2_arg_forture) {
       var __efb2_arg_forture;
-      return getDroppedItem(this, $$blockstate, $$random, __efb2_arg_forture);
+      return ModAPI.items[self.droppedItem].getRef();
     }
     const internalRegister = (): any => {
       let custom_block: any;
@@ -120,7 +123,11 @@ export default class OBlock {
     };
     if (!ModAPI.is_1_12) {
       if (ModAPI.materials) {
-        return internalRegister();
+        if (ModAPI.items[this.droppedItem]) {
+          return internalRegister();
+        } else {
+          ModAPI.addEventListener("bootstrap", internalRegister);
+        }
       } else {
         ModAPI.addEventListener("bootstrap", internalRegister);
       }
@@ -167,10 +174,10 @@ export default class OBlock {
   public async registerBlock(): Promise<void> {
     let custom_block: any;
     if (!ModAPI.is_1_12) {
-      custom_block = new OBlock(this.blockName, this.blockID, this.blockTexture, this.onBreak).register();
+      custom_block = new OBlock(this.blockName, this.blockID, this.blockTexture, this.onBreak, this.droppedItem).register();
     }
     if (ModAPI.is_1_12) {
-      var nmb_OBlock = new OBlock(this.blockName, this.blockID, this.blockTexture, this.onBreak).register();
+      var nmb_OBlock = new OBlock(this.blockName, this.blockID, this.blockTexture, this.onBreak, this.droppedItem).register();
       var itemClass = ModAPI.reflect.getClassById("net.minecraft.item.Item");
       var blockClass = ModAPI.reflect.getClassById("net.minecraft.block.Block");
       custom_block = nmb_OBlock
@@ -185,7 +192,7 @@ export default class OBlock {
     const self = this;
 
     if (!ModAPI.is_1_12) {
-      ModAPI.dedicatedServer.appendCode(`globalThis.registerServerBlock("${this.blockID}", ${this.onBreak});`);
+      ModAPI.dedicatedServer.appendCode(`globalThis.registerServerBlock("${this.blockID}", ${this.onBreak}, "${this.droppedItem}");`);
       ModAPI.addEventListener("lib:asyncsink", async () => {
         ModAPI.addEventListener(
           "lib:asyncsink:registeritems",
