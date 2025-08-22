@@ -67,7 +67,7 @@ export function registerServerItem(
   }
 
   ModAPI.reflect.prototypeStack(itemClass, nmi_OvenItem);
-
+  
   if (!ModAPI.is_1_12) {
     nmi_OvenItem.prototype.$onItemRightClick = function (
       $$itemstack: any,

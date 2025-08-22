@@ -163,7 +163,8 @@ ModAPI.addEventListener("lib:OvenMDK:loaded", (event: any) => {
       - Added custom Block drops
       - Added better handling for ore generation
       - Added custom Furnace recipes
-      - Added custom models for blocks, entities, and items`)
+      - Added custom models for blocks, entities, and items
+      - Added more customizations for OItems and OBlocks`)
   });
 });
 ModAPI.addCredit(

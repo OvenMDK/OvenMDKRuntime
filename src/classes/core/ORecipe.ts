@@ -170,10 +170,16 @@ export function ORecipe(
 }
 export function registerOvenMDKFurnaceRecipe(input_item: string, resultItem: string, experience: number) {
     function $$internalRegister() {
-        const $$itemStackFromBlockWithMeta =
-            ModAPI.reflect.getClassById("net.minecraft.item.ItemStack").constructors[2];
-        const $$itemStackFromItem =
+        
+        const ItemStackCtorFromBlock =
+            ModAPI.reflect.getClassById("net.minecraft.item.ItemStack").constructors[1];
+        const ItemStackCtorFromItem =
             ModAPI.reflect.getClassById("net.minecraft.item.ItemStack").constructors[4];
+
+        const FurnaceRecipesInstance =
+            ModAPI.util.wrap(
+                ModAPI.reflect.getClassByName("FurnaceRecipes").staticVariables.smeltingBase
+            );
 
         const parseEntry = (entry: string) => {
             let type: "block" | "item";
@@ -185,6 +191,7 @@ export function registerOvenMDKFurnaceRecipe(input_item: string, resultItem: str
                 id = parts[0];
                 meta = parseInt(parts[1], 10) || 0;
             }
+
             if (id.startsWith("block/")) {
                 type = "block";
                 id = id.replace("block/", "");
@@ -207,32 +214,33 @@ export function registerOvenMDKFurnaceRecipe(input_item: string, resultItem: str
         const input = parseEntry(input_item);
         const output = parseEntry(resultItem);
 
-        const $$inputStack = (input.type === "block")
-            ? $$itemStackFromBlockWithMeta(ModAPI.blocks[input.id].getRef(), 1, input.meta)
-            : $$itemStackFromItem(ModAPI.items[input.id].getRef(), 1, input.meta || 0);
-
-        const $$outputStack = (output.type === "block")
-            ? $$itemStackFromBlockWithMeta(ModAPI.blocks[output.id].getRef(), 1, output.meta)
-            : $$itemStackFromItem(ModAPI.items[output.id].getRef(), 1, output.meta || 0);
-
-        const $$furnaceRecipes =
-            ModAPI.reflect.getClassById("net.minecraft.item.crafting.FurnaceRecipes")
-                .staticMethods.instance.method();
-
-        ModAPI.hooks.methods.nmic_FurnaceRecipes_addSmelting(
-            $$furnaceRecipes,
-            $$inputStack,
-            $$outputStack,
-            experience
-        );
+        const $$outputStack =
+            output.type === "block"
+                ? ItemStackCtorFromBlock(ModAPI.blocks[output.id].getRef(), 1)
+                : ItemStackCtorFromItem(ModAPI.items[output.id].getRef(), 1);
+        if (input.type === "block") {
+            FurnaceRecipesInstance.addSmeltingRecipeForBlock(
+                ModAPI.blocks[input.id].getRef(),
+                $$outputStack,
+                experience
+            );
+        } else {
+            FurnaceRecipesInstance.addSmelting(
+                ModAPI.items[input.id].getRef(),
+                $$outputStack,
+                experience
+            );
+        }
     }
 
-    if (ModAPI.items) {
+
+    if (ModAPI.items && ModAPI.blocks) {
         $$internalRegister();
     } else {
         ModAPI.addEventListener("bootstrap", $$internalRegister);
     }
 }
+
 
 export function OFurnanceRecipe(
     input_item: string,
@@ -242,11 +250,9 @@ export function OFurnanceRecipe(
     if (ModAPI.is_1_12) {
         console.warn("OFurnaceRecipes do not work in 1.12.2 please use 1.8 for OFurnaceRecipes!")
     } else {
-        if (!ModAPI.server) {
             ModAPI.dedicatedServer.appendCode(
-                `globalThis.registerServerORecipe("${input_item}", "${resultItem}", ${experience});`
+                `globalThis.registerServerOFurnanceRecipe("${input_item}", "${resultItem}", ${experience});`
             );
-        }
         globalThis.registerOvenMDKFurnaceRecipe(input_item, resultItem, experience);
     };
 }
