@@ -2,38 +2,22 @@ import OItem from "./OItem";
 import OSpawnegg from "./OSpawnegg";
 
 export default class OEntity {
-  private entityTexture: string;
+  public entityTexture: string;
   private entityName: string;
   private entityID: string;
-  private entityModel: string;
+  public entityModel: string;
   private entity_sound_main: string;
-  private entityBreedItem: string;
-  private entityDropItem: string;
+  public entityBreedItem: string;
+  public entityDropItem: string;
   private eggBase: any;
   private eggSpots: any;
   private extra_tasks: any[];
   constructor(
     entityName: string,
     entityID: string,
-    entityTexture: string,
-    entityModel: string,
-    entity_sound_main: string,
-    entityBreedItem: string,
-    entityDropItem: string,
-    eggBase: any,
-    eggSpots: any,
-    extra_tasks: any[]
   ) {
     this.entityName = entityName;
     this.entityID = entityID;
-    this.entityTexture = entityTexture;
-    this.entityModel = entityModel;
-    this.entity_sound_main = entity_sound_main;
-    this.entityBreedItem = entityBreedItem || "wheat"; //default breed item
-    this.entityDropItem = entityDropItem || "feather"; //default drop item
-    this.eggBase = eggBase || 0x5e3e2d; //default egg base color
-    this.eggSpots = eggSpots || 0x269166; //default egg spots color
-    this.extra_tasks = extra_tasks;
   }
   private async waitForRenderManager() {
     return new Promise((res: any, rej: any) => {
@@ -47,6 +31,8 @@ export default class OEntity {
       check();
     });
   }
+
+
 
   private registerEntityClient() {
     console.warn("OEntitys are still in development, expect bugs and issues");
@@ -458,33 +444,7 @@ export default class OEntity {
     globalThis[key] = data;
   }
 
-  public createSpawnegg(texture) {
-    if (!texture) {
-      texture = `textures/entity/${this.entityID}.png`;
-    }
-    return console.log(`Spawn eggs are built in!`);
-    var spawnEgg = new OItem(
-      `Spawn ${this.entityName}`,
-      `spawnegg_${this.entityID}`,
-      64,
-      texture,
-      () => { },
-      ($$itemstack, $$world, $$player, $$blockpos) => {
-        console.log($$blockpos);
-        var spawn_x = $$blockpos.$x;
-        var spawn_y = $$blockpos.$y + 1;
-        var spawn_z = $$blockpos.$z;
-
-        OvenMDK__executeCommandAs(
-          $$player,
-          `/summon ExampleOEntity ${spawn_x} ${spawn_y} ${spawn_z}`,
-          true
-        );
-      }
-    );
-
-    spawnEgg.registerItem();
-
-    return spawnEgg;
+  public createSpawnegg(base, spots) {
+    
   }
 }
