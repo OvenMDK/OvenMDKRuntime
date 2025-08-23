@@ -36,3 +36,27 @@ sounds.addSound('1', 'soundfile');
 example.setMainSound(sounds); //whis will be changed later
 
 example.registerOEntity();
+
+// This part is how bendiegames would imagine it being made with the curent system
+const example = new OEntity(
+  "Example Entity Name",
+  "example_entity",
+  texture,
+  ModelCow, // or a custom model json that will be detected
+  10101, // egg color 1
+  10010, // egg color 2
+  "feather" // drop item
+  0, // min drop amount
+  2, // max drop amount
+  20, // max health
+  true, // is breedable
+  "wheat", // breeding item
+  2000, // breeding cooldown in ticks
+  "base64stringsound" // main sound
+)
+example.registerOEntity();
+  
+  
+  
+  
+  
