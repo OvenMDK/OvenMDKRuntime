@@ -67,7 +67,7 @@ export function registerServerItem(
   }
 
   ModAPI.reflect.prototypeStack(itemClass, nmi_OvenItem);
-  
+
   if (!ModAPI.is_1_12) {
     nmi_OvenItem.prototype.$onItemRightClick = function (
       $$itemstack: any,
@@ -255,9 +255,11 @@ export function registerServerBlock(
     //onBreak($world, $blockpos, $blockstate);
     return breakBlockMethod(this, $world, $blockpos, $blockstate);
   };
-  nmb_Oblock.prototype.$getItemDropped = function ($$blockstate, $$random, __efb2_arg_forture) {
-    var __efb2_arg_forture;
-    return ModAPI.items[droppedItem].getRef();
+  if (droppedItem) {
+    nmb_Oblock.prototype.$getItemDropped = function ($$blockstate, $$random, __efb2_arg_forture) {
+      var __efb2_arg_forture;
+      return ModAPI.items[droppedItem].getRef();
+    }
   }
   var $$onBlockDestroyedByPlayerMethod = BlockClass.methods.onBlockDestroyedByPlayer.method;
   nmb_Oblock.prototype.$onBlockDestroyedByPlayer = function ($$world, $$blockpos, $$blockstate) {
@@ -328,10 +330,14 @@ export function registerServerBlock(
   };
   if (!ModAPI.is_1_12) {
     if (ModAPI.materials) {
-      if (ModAPI.items[droppedItem]) {
-        return internalRegister();
+      if (droppedItem) {
+        if (ModAPI.items[droppedItem]) {
+          return internalRegister();
+        } else {
+          ModAPI.addEventListener("bootstrap", internalRegister);
+        }
       } else {
-        ModAPI.addEventListener("bootstrap", internalRegister);
+        return internalRegister();
       }
     } else {
       ModAPI.addEventListener("bootstrap", internalRegister);

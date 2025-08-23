@@ -88,9 +88,11 @@ export default class OBlock {
       self.onBreak.call($$world, $$blockpos, $$blockstate)
       return $$onBlockDestroyedByPlayerMethod(this, $$world, $$blockpos, $$blockstate);
     }
-    nmb_Oblock.prototype.$getItemDropped = function ($$blockstate, $$random, __efb2_arg_forture) {
-      var __efb2_arg_forture;
-      return ModAPI.items[self.droppedItem || self.blockID].getRef();
+    if (self.droppedItem) {
+      nmb_Oblock.prototype.$getItemDropped = function ($$blockstate, $$random, __efb2_arg_forture) {
+        var __efb2_arg_forture;
+        return ModAPI.items[self.droppedItem].getRef();
+      }
     }
     const internalRegister = (): any => {
       let custom_block: any;
@@ -123,10 +125,14 @@ export default class OBlock {
     };
     if (!ModAPI.is_1_12) {
       if (ModAPI.materials) {
-        if (ModAPI.items[this.droppedItem || this.blockID]) {
-          return internalRegister();
+        if (this.droppedItem) {
+          if (ModAPI.items[this.droppedItem]) {
+            return internalRegister();
+          } else {
+            ModAPI.addEventListener("bootstrap", internalRegister);
+          }
         } else {
-          ModAPI.addEventListener("bootstrap", internalRegister);
+          return internalRegister();
         }
       } else {
         ModAPI.addEventListener("bootstrap", internalRegister);
