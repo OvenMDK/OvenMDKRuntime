@@ -38,7 +38,7 @@ export default class OBlock {
     this.blockID = blockID;
     this.blockTexture = texture;
     this.onBreak = onBreak;
-    this.droppedItem = droppedItem || blockID;
+    this.droppedItem = droppedItem;
   }
 
   public register(): any {
@@ -90,7 +90,7 @@ export default class OBlock {
     }
     nmb_Oblock.prototype.$getItemDropped = function ($$blockstate, $$random, __efb2_arg_forture) {
       var __efb2_arg_forture;
-      return ModAPI.items[self.droppedItem].getRef();
+      return ModAPI.items[self.droppedItem || self.blockID].getRef();
     }
     const internalRegister = (): any => {
       let custom_block: any;
@@ -123,7 +123,7 @@ export default class OBlock {
     };
     if (!ModAPI.is_1_12) {
       if (ModAPI.materials) {
-        if (ModAPI.items[this.droppedItem]) {
+        if (ModAPI.items[this.droppedItem || this.blockID]) {
           return internalRegister();
         } else {
           ModAPI.addEventListener("bootstrap", internalRegister);
