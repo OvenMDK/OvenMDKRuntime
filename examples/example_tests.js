@@ -38,6 +38,7 @@ example.setMainSound(sounds); //whis will be changed later
 example.registerOEntity();
 
 // This part is how bendiegames would imagine it being made with the curent system
+// due to tha fact that most of these features should be optional, this shouln't be added
 const example = new OEntity(
   "Example Entity Name",
   "example_entity",
