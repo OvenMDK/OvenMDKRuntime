@@ -46,7 +46,7 @@ const example = new OEntity(
   ModelCow, // or a custom model json that will be detected
   10101, // egg color 1
   10010, // egg color 2
-  "feather" // drop item
+  "feather", // drop item
   0, // min drop amount
   2, // max drop amount
   20, // max health

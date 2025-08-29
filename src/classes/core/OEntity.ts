@@ -7,7 +7,9 @@ export default class OEntity {
   private entityID: string;
   public entityModel: string;
   private entity_sound_main: string;
+  public maxHealth: number = 0;
   public entityBreedItem: string;
+  public breedable: boolean = false;
   public entityDropItem: string;
   private eggBase: any;
   private eggSpots: any;
@@ -32,7 +34,31 @@ export default class OEntity {
     });
   }
 
+  public setTexture(texture: string) {
+    this.entityTexture = texture;
+  }
 
+  public setModel(model: string) {
+    this.entityModel = model;
+  }
+
+  public createSpawnEgg(eggBase?: number, eggSpots?: number) {
+
+  }
+
+  public makeBreedable(item: string, delay: number) {
+    this.breedable = true;
+    this.entityBreedItem = item;
+  }
+
+  // we need to add loot tables, and this will be changed next commit
+  public addDropItem(item: string, min : number, max : number) {
+    this.entityDropItem = item;
+  }
+
+  public setHealth(health: number) {
+    this.maxHealth = health;
+  }
 
   private registerEntityClient() {
     console.warn("OEntitys are still in development, expect bugs and issues");
