@@ -72,7 +72,7 @@ export function registerOvenMDKRecipe(pattern: string, result: string) {
                     .staticMethods.valueOf.method(char.charCodeAt(0));
 
             const parseEntry = (entry: string) => {
-                let type: "block" | "item";
+                let type: "block" | "item" | "air";
                 let id = entry;
                 let meta = 0;
 
@@ -92,7 +92,10 @@ export function registerOvenMDKRecipe(pattern: string, result: string) {
                         type = "block";
                     } else if (ModAPI.items[id]) {
                         type = "item";
-                    } else {
+                    } else if (id === "") {
+                        type = "air";
+                    }
+                    else {
                         throw new Error(`Unknown item/block id: ${entry}`);
                     }
                 }
@@ -118,9 +121,16 @@ export function registerOvenMDKRecipe(pattern: string, result: string) {
             Object.keys($$recipeLegend).forEach(key => {
                 $$recipeInternal.push($$ToChar(key));
                 const ing = $$recipeLegend[key];
-                const ingredient = (ing.type === "block")
-                    ? $$itemStackFromBlockWithMeta(ModAPI.blocks[ing.id].getRef(), 1, ing.meta)
-                    : $$itemStackFromItem(ModAPI.items[ing.id].getRef(), 1, ing.meta || 0);
+                let ingredient;
+                if (ing.type === "air") {
+                    ingredient = "";
+                } else if (ing.type === "block") {
+
+                    $$itemStackFromBlockWithMeta(ModAPI.blocks[ing.id].getRef(), 1, ing.meta)
+                }
+                else if (ing.type === "item") {
+                    $$itemStackFromItem(ModAPI.items[ing.id].getRef(), 1, ing.meta || 0);
+                }
                 $$recipeInternal.push(ingredient);
             });
 
@@ -170,7 +180,7 @@ export function ORecipe(
 }
 export function registerOvenMDKFurnaceRecipe(input_item: string, resultItem: string, experience: number) {
     function $$internalRegister() {
-        
+
         const ItemStackCtorFromBlock =
             ModAPI.reflect.getClassById("net.minecraft.item.ItemStack").constructors[1];
         const ItemStackCtorFromItem =
@@ -250,9 +260,9 @@ export function OFurnanceRecipe(
     if (ModAPI.is_1_12) {
         console.warn("OFurnaceRecipes do not work in 1.12.2 please use 1.8 for OFurnaceRecipes!")
     } else {
-            ModAPI.dedicatedServer.appendCode(
-                `globalThis.registerServerOFurnanceRecipe("${input_item}", "${resultItem}", ${experience});`
-            );
+        ModAPI.dedicatedServer.appendCode(
+            `globalThis.registerServerOFurnanceRecipe("${input_item}", "${resultItem}", ${experience});`
+        );
         globalThis.registerOvenMDKFurnaceRecipe(input_item, resultItem, experience);
     };
 }
