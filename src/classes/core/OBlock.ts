@@ -26,19 +26,22 @@ export default class OBlock {
   private blockID: string;
   private blockInstance: any;
   private onBreak: (world: any, pos: any, state: any) => void;
+  private customModel: string;
   private droppedItem: string;
   constructor(
     blockName: string,
     blockID: string,
     texture: string,
     onBreak: (world: any, pos: any, state: any) => void,
-    droppedItem: string
+    droppedItem: string,
+    customModel: string
   ) {
     this.blockName = blockName;
     this.blockID = blockID;
     this.blockTexture = texture;
     this.onBreak = onBreak;
     this.droppedItem = droppedItem;
+    this.customModel = customModel;
   }
 
   public register(): any {
@@ -180,10 +183,10 @@ export default class OBlock {
   public async registerBlock(): Promise<void> {
     let custom_block: any;
     if (!ModAPI.is_1_12) {
-      custom_block = new OBlock(this.blockName, this.blockID, this.blockTexture, this.onBreak, this.droppedItem).register();
+      custom_block = new OBlock(this.blockName, this.blockID, this.blockTexture, this.onBreak, this.droppedItem, this.customModel).register();
     }
     if (ModAPI.is_1_12) {
-      var nmb_OBlock = new OBlock(this.blockName, this.blockID, this.blockTexture, this.onBreak, this.droppedItem).register();
+      var nmb_OBlock = new OBlock(this.blockName, this.blockID, this.blockTexture, this.onBreak, this.droppedItem, this.customModel).register();
       var itemClass = ModAPI.reflect.getClassById("net.minecraft.item.Item");
       var blockClass = ModAPI.reflect.getClassById("net.minecraft.block.Block");
       custom_block = nmb_OBlock
@@ -209,16 +212,22 @@ export default class OBlock {
 
         AsyncSink.L10N.set(`tile.${self.blockID}.name`, self.blockName);
         console.log(`Set localization for block ${self.blockID}`);
-        AsyncSink.setFile(
-          `resourcepacks/AsyncSinkLib/assets/minecraft/models/block/${self.blockID}.json`,
-          JSON.stringify({
-            parent: "block/cube_all",
-            textures: {
-              all: `blocks/${self.blockID}`,
-            },
-          })
-        );
-
+        if (!self.customModel) {
+          AsyncSink.setFile(
+            `resourcepacks/AsyncSinkLib/assets/minecraft/models/block/${self.blockID}.json`,
+            JSON.stringify({
+              parent: "block/cube_all",
+              textures: {
+                all: `blocks/${self.blockID}`,
+              },
+            })
+          );
+        } else {
+          AsyncSink.setFile(
+            `resourcepacks/AsyncSinkLib/assets/minecraft/models/block/${self.blockID}.json`,
+            self.customModel
+          );
+        }
         AsyncSink.setFile(
           `resourcepacks/AsyncSinkLib/assets/minecraft/models/item/${self.blockID}.json`,
           JSON.stringify({
@@ -268,14 +277,18 @@ export default class OBlock {
         AsyncSink.L10N.set("tile." + this.blockID + ".name", this.blockName);
         console.log(`Set localization for block ${self.blockID}`);
         console.log(custom_block || "Block registration failed");
-        AsyncSink.setFile(`resourcepacks/AsyncSinkLib/assets/minecraft/models/block/${self.blockID}.json`, JSON.stringify(
-          {
-            "parent": "block/cube_all",
-            "textures": {
-              "all": `blocks/${self.blockID}`
+        if (!self.customModel) {
+          AsyncSink.setFile(`resourcepacks/AsyncSinkLib/assets/minecraft/models/block/${self.blockID}.json`, JSON.stringify(
+            {
+              "parent": "block/cube_all",
+              "textures": {
+                "all": `blocks/${self.blockID}`
+              }
             }
-          }
-        ));
+          ));
+        } else {
+          AsyncSink.setFile(`resourcepacks/AsyncSinkLib/assets/minecraft/models/block/${self.blockID}.json`, self.customModel);
+        }
 
         AsyncSink.setFile(`resourcepacks/AsyncSinkLib/assets/minecraft/models/item/${self.blockID}.json`, JSON.stringify(
           {
