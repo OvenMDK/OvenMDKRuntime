@@ -31,9 +31,7 @@ example.setHealth(20);
 example.maxHealth = 20;
 
 //wip
-var sounds = example.createSoundObject('random');
-sounds.addSound('1', 'soundfile');
-example.setMainSound(sounds); //whis will be changed later
+example.setSound('step', 'base64stringsound');
 
 example.registerOEntity();
 

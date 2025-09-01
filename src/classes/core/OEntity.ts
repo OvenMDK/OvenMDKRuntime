@@ -11,6 +11,7 @@ export default class OEntity {
   public entityBreedItem: string;
   public breedable: boolean = false;
   public entityDropItem: string;
+  public useSpawnEgg: boolean = false;
   private eggBase: any;
   private eggSpots: any;
   private extra_tasks: any[];
@@ -43,7 +44,9 @@ export default class OEntity {
   }
 
   public createSpawnEgg(eggBase?: number, eggSpots?: number) {
-
+    this.eggBase = eggBase || 0x5e3e2d; // default egg base color
+    this.eggSpots = eggSpots || 0x269166; // default egg spots color
+    this.useSpawnEgg = true;
   }
 
   public makeBreedable(item: string, delay: number) {
@@ -250,7 +253,8 @@ export default class OEntity {
         1
       );
     };
-    nme_OEntity.prototype.$getDropItem = function () {
+
+    if (this.entityDropItem) nme_OEntity.prototype.$getDropItem = function () {
       return ModAPI.items[this.entityDropItem].getRef();
     };
     nme_OEntity.prototype.$createChild = function (otherParent) {
@@ -258,7 +262,7 @@ export default class OEntity {
       return new nme_OEntity(this.wrapped.worldObj?.getRef() ?? null);
     };
 
-    nme_OEntity.prototype.$isBreedingItem = function (itemstack) {
+    if (this.breedable) nme_OEntity.prototype.$isBreedingItem = function (itemstack) {
       return (
         itemstack !== null &&
         itemstack.$getItem() === ModAPI.items[entityBreedItem2].getRef()
