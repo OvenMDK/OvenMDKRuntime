@@ -2,4 +2,4 @@
 
 # OvenMDK runtime ( Source code and releases )
 
-Source code and offical releases can be found here!
+Source code and official releases can be found here!
