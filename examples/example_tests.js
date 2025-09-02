@@ -12,11 +12,14 @@ example.entityTexture = '';
 example.setModel('{}');
 example.entityModel = '{}';
 
+example.entitySize = 1.0;
+
 //spawn egg (base, spot colors)
 example.createSpawnEgg(0x5e3e2d, 0x269166);
 
 //item needed, delay in ticks
-example.makeBreedable('wheat', 2000);
+example.makeBreedable('wheat', 
+  2000);
 example.setBreedingCooldown(2000); //ticks
 example.breedable = true;
 example.breedItem = 'wheat';
