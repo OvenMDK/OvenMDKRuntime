@@ -52,6 +52,7 @@ const devmode = true;
 ModAPI.events.newEvent("lib:OvenMDK:load");
 ModAPI.events.newEvent("lib:OvenMDK:loaded");
 ModAPI.addEventListener("lib:OvenMDK:load", () => {
+  // When I get home I am going to make it look better.
   console.log("OvenMDK Runtime is loading");
   console.log("Loading OvenMDK globals");
   globalThis.registerServerItem = registerServerItem;
