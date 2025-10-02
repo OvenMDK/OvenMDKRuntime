@@ -122,8 +122,8 @@ export default class OBlock {
       this.fixupBlockIds();
       ModAPI.blocks[this.blockID] = custom_block;
       this.blockInstance = custom_block;
-      console.log("Registered block on client: " + this.blockID);
-      console.log(custom_block);
+      new globalThis.OvenMDKLogger("Registered block on client: " + this.blockID);
+      new globalThis.OvenMDKLogger(custom_block);
       return custom_block;
     };
     if (!ModAPI.is_1_12) {
@@ -196,7 +196,7 @@ export default class OBlock {
         custom_block
       );
       itemClass.staticMethods.registerItemBlock0.method(custom_block);
-      console.log(custom_block || "Block registration failed");
+      new globalThis.OvenMDKLogger(custom_block || "Block registration failed");
     }
     const self = this;
 
@@ -211,7 +211,7 @@ export default class OBlock {
         );
 
         AsyncSink.L10N.set(`tile.${self.blockID}.name`, self.blockName);
-        console.log(`Set localization for block ${self.blockID}`);
+        new globalThis.OvenMDKLogger(`Set localization for block ${self.blockID}`);
         if (!self.customModel) {
           AsyncSink.setFile(
             `resourcepacks/AsyncSinkLib/assets/minecraft/models/block/${self.blockID}.json`,
@@ -269,14 +269,14 @@ export default class OBlock {
         ModAPI.addEventListener(
           "lib:asyncsink:registeritems",
           (renderItem: any) => {
-            console.log("cool register block")
-            console.log(custom_block || "Block registration failed");
+            new globalThis.OvenMDKLogger("cool register block")
+            new globalThis.OvenMDKLogger(custom_block || "Block registration failed");
             renderItem.registerBlock(custom_block, ModAPI.util.str(this.blockID));
           }
         );
         AsyncSink.L10N.set("tile." + this.blockID + ".name", this.blockName);
-        console.log(`Set localization for block ${self.blockID}`);
-        console.log(custom_block || "Block registration failed");
+        new globalThis.OvenMDKLogger(`Set localization for block ${self.blockID}`);
+        new globalThis.OvenMDKLogger(custom_block || "Block registration failed");
         if (!self.customModel) {
           AsyncSink.setFile(`resourcepacks/AsyncSinkLib/assets/minecraft/models/block/${self.blockID}.json`, JSON.stringify(
             {

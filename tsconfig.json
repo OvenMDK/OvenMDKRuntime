@@ -4,7 +4,9 @@
         "lib": ["es5", "es6", "dom", "WebWorker"],
         "rootDir": "src",
         "baseUrl": "src/",
-        "typeRoots": ["src/d.ts", "node_modules/@types"]
+        "typeRoots": ["src/d.ts", "node_modules/@types"],
+        "esModuleInterop": true,
+        "allowSyntheticDefaultImports": true,
         
     }
 }

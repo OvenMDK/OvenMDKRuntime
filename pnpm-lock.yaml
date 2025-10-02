@@ -11,6 +11,9 @@ importers:
       css-loader:
         specifier: ^6.8.1
         version: 6.11.0(webpack@5.99.9)
+      dayjs:
+        specifier: ^1.11.18
+        version: 1.11.18
       ts-loader:
         specifier: ^9.4.4
         version: 9.5.2(typescript@5.8.3)(webpack@5.99.9)
@@ -231,6 +234,9 @@ packages:
     resolution: {integrity: sha512-/Tb/JcjK111nNScGob5MNtsntNM1aCNUDipB/TkwZFhyDrrE47SOx/18wF2bbjgc3ZzCSKW1T5nt5EbFoAz/Vg==}
     engines: {node: '>=4'}
     hasBin: true
+
+  dayjs@1.11.18:
+    resolution: {integrity: sha512-zFBQ7WFRvVRhKcWoUh+ZA1g2HVgUbsZm9sbddh8EC5iv93sui8DVVz1Npvz+r6meo9VKfa8NyLWBsQK1VvIKPA==}
 
   electron-to-chromium@1.5.166:
     resolution: {integrity: sha512-QPWqHL0BglzPYyJJ1zSSmwFFL6MFXhbACOCcsCdUMCkzPdS9/OIBVxg516X/Ado2qwAq8k0nJJ7phQPCqiaFAw==}
@@ -860,6 +866,8 @@ snapshots:
       webpack: 5.99.9(webpack-cli@5.1.4)
 
   cssesc@3.0.0: {}
+
+  dayjs@1.11.18: {}
 
   electron-to-chromium@1.5.166: {}
 

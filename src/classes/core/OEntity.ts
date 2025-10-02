@@ -43,7 +43,7 @@ export default class OEntity {
   }
 
   public createSpawnEgg(eggBase?: number, eggSpots?: number) {
-
+    new globalThis.OvenMDKLogger()
   }
 
   public makeBreedable(item: string, delay: number) {
@@ -373,7 +373,7 @@ export default class OEntity {
         2,
         3
       );
-      console.log(nme_OEntity);
+      new globalThis.OvenMDKLogger(nme_OEntity);
       BiomeGenSwamp.spawnableCreatureList.add(duckSpawnSwamp);
       BiomeGenRiver.spawnableCreatureList.add(duckSpawnRiverBed);
       BiomeGenBeach.spawnableCreatureList.add(duckSpawnBeach);
@@ -462,10 +462,10 @@ export default class OEntity {
       ModAPI.promisify(ModAPI.mc.renderEngine.bindTexture)(
         data[`${this.entityID}Textures`]
       ).then(() => {
-        console.log("Loaded OEntity texture into cache.");
+        new globalThis.OvenMDKLogger("Loaded OEntity texture into cache.");
       });
     });
-    console.log(data);
+    new globalThis.OvenMDKLogger(data);
     const key = `OEntity.${this.entityID}`;
     globalThis[key] = data;
   }

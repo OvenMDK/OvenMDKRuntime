@@ -38,22 +38,27 @@ import {
   registerEntityServer,
   OvenMDK__defineExecCmdAsGlobal,
   registerOvenOreServer,
-} from "classes/core/Helper_func";
-import OItem from "classes/core/OItem";
-import OMod from "classes/core/Mod";
-import Oven from "classes/core/Oven";
-import OBlock from "classes/core/OBlock";
-import { simplecommand } from "classes/core/commands";
+} from "./classes/core/Helper_func";
+import OItem from "./classes/core/OItem";
+import OMod from "./classes/core/Mod";
+import Oven from "./classes/core/Oven";
+import OBlock from "./classes/core/OBlock";
+import { simplecommand } from "./classes/core/commands";
 import OEntity from "./classes/core/OEntity";
-import OvenOre from "classes/core/OvenOre";
+import OvenOre from "./classes/core/OvenOre";
 import { ORecipe, registerOvenMDKRecipe, OFurnanceRecipe, registerOvenMDKFurnaceRecipe } from "classes/core/ORecipe";
+import OvenMDKLogger from "./classes/core/log";
 
 const devmode = true;
 ModAPI.events.newEvent("lib:OvenMDK:load");
 ModAPI.events.newEvent("lib:OvenMDK:loaded");
 ModAPI.addEventListener("lib:OvenMDK:load", () => {
-  console.log("OvenMDK Runtime is loading");
-  console.log("Loading OvenMDK globals");
+  new OvenMDKLogger({ appName: "OvenMDK" }).log("Initializing OvenMDK Runtime");
+  new OvenMDKLogger({ appName: "OvenMDK" }).log("Loading OvenMDK globals");
+  function OvenMDK_log_helper(msg: string) {
+    new OvenMDKLogger({ appName: "OvenMDK" }).log(msg);
+  }
+  globalThis.OvenMDKLogger = OvenMDK_log_helper;
   globalThis.registerServerItem = registerServerItem;
   globalThis.registerServerBlock = registerServerBlock;
   globalThis.registerEntityServer = registerEntityServer;
@@ -74,47 +79,51 @@ ModAPI.addEventListener("lib:OvenMDK:load", () => {
       alert(
         "OvenMDK does not fully support 1.12 at this time, please use 1.8.8 for full support"
       );
-      console.log("1.12 detected");
+      new globalThis.OvenMDKLogger("1.12 detected");
       console.error(
         "OvenMDK does not fully support 1.12 at this time, please use 1.8.8 for full support"
       );
     }
   }
-  console.log("OvenMDK globals have been set and loaded");
+  new globalThis.OvenMDKLogger("OvenMDK globals have been set and loaded");
   ModAPI.dedicatedServer.appendCode(
     `globalThis.registerServerItem = ${registerServerItem};`
   );
-  console.log("Register Item serverside function loaded");
+  new globalThis.OvenMDKLogger("Register Item serverside function loaded");
+  /*ModAPI.dedicatedServer.appendCode(
+    `new globalThis.OvenMDKLogger = ${OvenMDK_log_helper};`
+  );
+  */new globalThis.OvenMDKLogger("server side logger function loaded");
   ModAPI.dedicatedServer.appendCode(
     `globalThis.registerOvenOreServer = ${registerOvenOreServer};`
   );
-  console.log("Register Oven Ore serverside function loaded");
+  new globalThis.OvenMDKLogger("Register Oven Ore serverside function loaded");
   ModAPI.dedicatedServer.appendCode(
         `globalThis.registerServerORecipe = ${registerOvenMDKRecipe};`
     );
-  console.log("Register ORecipe serverside function loaded");
+  new globalThis.OvenMDKLogger("Register ORecipe serverside function loaded");
   ModAPI.dedicatedServer.appendCode(
         `globalThis.registerServerOFurnanceRecipe = ${registerOvenMDKFurnaceRecipe};`
     );
-  console.log("Register OFurnanceRecipe serverside function loaded");
+  new globalThis.OvenMDKLogger("Register OFurnanceRecipe serverside function loaded");
   ModAPI.dedicatedServer.appendCode(OvenMDK__defineExecCmdAsGlobal);
   OvenMDK__defineExecCmdAsGlobal();
-  console.log(
+  new globalThis.OvenMDKLogger(
     "OvenMDK__ExecCmdAsGlobal serverside and clientside function loaded"
   );
   ModAPI.dedicatedServer.appendCode(
     `globalThis.registerServerBlock = ${registerServerBlock};`
   );
-  console.log("Register Entity serverside function loaded");
+  new globalThis.OvenMDKLogger("Register Entity serverside function loaded");
   ModAPI.dedicatedServer.appendCode(
     `globalThis.registerEntityServer = ${registerEntityServer};`
   );
-  console.log("Register Block serverside function loaded");
+  new globalThis.OvenMDKLogger("Register Block serverside function loaded");
   ModAPI.events.callEvent("lib:OvenMDK:loaded", { version: "v0.4" });
 });
 ModAPI.addEventListener("lib:OvenMDK:loaded", (event: any) => {
-  console.log("OvenMDK Runtime has finished loading");
-  console.log(`
+  new globalThis.OvenMDKLogger("OvenMDK Runtime has finished loading");
+  new globalThis.OvenMDKLogger(`
     ┌───────────────────────────────────┐
     │                                   │
     │   OvenMDK has loaded              │

@@ -103,8 +103,8 @@ export default class OItem {
 
         self.onRightClick($$itemstack, $$world, $$player);
         if (globalThis.Debug_mode) {
-          console.log(`client itemstack:`);
-          console.log($$itemstack);
+          new globalThis.OvenMDKLogger(`client itemstack:`);
+          new globalThis.OvenMDKLogger($$itemstack);
         }
         return ($$itemstack);
       }
@@ -120,8 +120,8 @@ export default class OItem {
         var $$itemstack, $$world, $$player;
         self.onRightClick($$itemstack, $$world, $$player);
         if (globalThis.Debug_mode) {
-          console.log(`client itemstack:`);
-          console.log($$itemstack);
+          new globalThis.OvenMDKLogger(`client itemstack:`);
+          new globalThis.OvenMDKLogger($$itemstack);
         }
         return ($$ActionResult($$ResultEnum.SUCCESS, $$itemstack));
       }
@@ -136,8 +136,8 @@ export default class OItem {
         var $$itemstack, $$world, $$player, $$blockpos;
         if (self.onItemUse) { self.onItemUse($$itemstack, $$world, $$player, $$blockpos) };
         if (globalThis.Debug_mode) {
-          console.log(`client itemstack:`);
-          console.log($$itemstack);
+          new globalThis.OvenMDKLogger(`client itemstack:`);
+          new globalThis.OvenMDKLogger($$itemstack);
         }
         return 0;
       }
@@ -185,9 +185,9 @@ export default class OItem {
       );
 
       ModAPI.items[`${self.itemID}`] = itemInstance;
-      console.log(itemInstance);
+      new globalThis.OvenMDKLogger(itemInstance);
 
-      console.log("Registered OvenMDK item ( client side )");
+      new globalThis.OvenMDKLogger("Registered OvenMDK item ( client side )");
 
       return itemInstance;
     };
@@ -208,13 +208,13 @@ export default class OItem {
         ModAPI.addEventListener(
           "lib:asyncsink:registeritems",
           (renderItem: any) => {
-            console.log("cool reg for");
-            console.log(self.itemID);
+            new globalThis.OvenMDKLogger("cool reg for");
+            new globalThis.OvenMDKLogger(self.itemID);
             renderItem.registerItem(custom_item, ModAPI.util.str(self.itemID));
           }
         );
         if (globalThis.Debug_mode) {
-          console.log(`registering ${self.itemID}`);
+          new globalThis.OvenMDKLogger(`registering ${self.itemID}`);
         }
 
         AsyncSink.L10N.set(`item.${self.itemID}.name`, self.itemName);
@@ -236,7 +236,7 @@ export default class OItem {
           const decoder = new TextDecoder(encoding);
           return decoder.decode(buffer);
         }
-        console.log(await (arrayBufferToString(AsyncSink.getFile(`resourcepacks/AsyncSinkLib/assets/minecraft/models/item/${self.itemID}.json`))))
+        new globalThis.OvenMDKLogger(await (arrayBufferToString(AsyncSink.getFile(`resourcepacks/AsyncSinkLib/assets/minecraft/models/item/${self.itemID}.json`))))
         const response = await fetch(self.itemTexture);
         const buffer = await response.arrayBuffer();
 

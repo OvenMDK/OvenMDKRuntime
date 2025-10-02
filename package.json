@@ -3,13 +3,14 @@
   "version": "0.0.1",
   "description": "Dev kit used for simplifying EaglerForge mod development.",
   "scripts": {
-    "build": "webpack --config webpack.config.js",
+    "build": "webpack --config webpack.config.js --watch",
     "build-bun": "npx bun build --bundle ./src/main.ts --outdir=build/ --outfile=build/NAME.js --sourcemap=inline --watch --target browser --entry-naming EaglerForge-[hash].js",
     "build-es": "npx esbuild --bundle ./src/main.ts --outfile=build/NAME.js --sourcemap=inline --watch=forever"
   },
   "author": "Block_2222",
   "devDependencies": {
     "css-loader": "^6.8.1",
+    "dayjs": "^1.11.18",
     "ts-loader": "^9.4.4",
     "typescript": "^5.2.2",
     "webpack": "^5.88.2",
