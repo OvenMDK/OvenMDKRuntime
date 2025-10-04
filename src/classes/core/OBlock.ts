@@ -277,6 +277,7 @@ export default class OBlock {
         AsyncSink.L10N.set("tile." + this.blockID + ".name", this.blockName);
         new globalThis.OvenMDKLogger(`Set localization for block ${self.blockID}`);
         new globalThis.OvenMDKLogger(custom_block || "Block registration failed");
+        new globalThis.OvenMDKLogger(`custom cool: ${self.customModel}`);
         if (!self.customModel) {
           AsyncSink.setFile(`resourcepacks/AsyncSinkLib/assets/minecraft/models/block/${self.blockID}.json`, JSON.stringify(
             {

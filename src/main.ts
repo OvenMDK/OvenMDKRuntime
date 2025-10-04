@@ -55,10 +55,10 @@ ModAPI.events.newEvent("lib:OvenMDK:loaded");
 ModAPI.addEventListener("lib:OvenMDK:load", () => {
   new OvenMDKLogger({ appName: "OvenMDK" }).log("Initializing OvenMDK Runtime");
   new OvenMDKLogger({ appName: "OvenMDK" }).log("Loading OvenMDK globals");
-  function OvenMDK_log_helper(msg: string) {
+  globalThis.OvenMDKLogger = (msg: string) => {
     new OvenMDKLogger({ appName: "OvenMDK" }).log(msg);
-  }
-  globalThis.OvenMDKLogger = OvenMDK_log_helper;
+  };
+
   globalThis.registerServerItem = registerServerItem;
   globalThis.registerServerBlock = registerServerBlock;
   globalThis.registerEntityServer = registerEntityServer;
@@ -99,12 +99,12 @@ ModAPI.addEventListener("lib:OvenMDK:load", () => {
   );
   new globalThis.OvenMDKLogger("Register Oven Ore serverside function loaded");
   ModAPI.dedicatedServer.appendCode(
-        `globalThis.registerServerORecipe = ${registerOvenMDKRecipe};`
-    );
+    `globalThis.registerServerORecipe = ${registerOvenMDKRecipe};`
+  );
   new globalThis.OvenMDKLogger("Register ORecipe serverside function loaded");
   ModAPI.dedicatedServer.appendCode(
-        `globalThis.registerServerOFurnanceRecipe = ${registerOvenMDKFurnaceRecipe};`
-    );
+    `globalThis.registerServerOFurnanceRecipe = ${registerOvenMDKFurnaceRecipe};`
+  );
   new globalThis.OvenMDKLogger("Register OFurnanceRecipe serverside function loaded");
   ModAPI.dedicatedServer.appendCode(OvenMDK__defineExecCmdAsGlobal);
   OvenMDK__defineExecCmdAsGlobal();

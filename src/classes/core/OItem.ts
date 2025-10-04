@@ -218,6 +218,7 @@ export default class OItem {
         }
 
         AsyncSink.L10N.set(`item.${self.itemID}.name`, self.itemName);
+        new globalThis.OvenMDKLogger(`custom cool: ${self.customModel}`);
         if (!self.customModel) {
           AsyncSink.setFile(`resourcepacks/AsyncSinkLib/assets/minecraft/models/item/${self.itemID}.json`, JSON.stringify(
             {
