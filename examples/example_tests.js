@@ -12,11 +12,14 @@ example.entityTexture = '';
 example.setModel('{}');
 example.entityModel = '{}';
 
+example.entitySize = 1.0;
+
 //spawn egg (base, spot colors)
 example.createSpawnEgg(0x5e3e2d, 0x269166);
 
 //item needed, delay in ticks
-example.makeBreedable('wheat', 2000);
+example.makeBreedable('wheat', 
+  2000);
 example.setBreedingCooldown(2000); //ticks
 example.breedable = true;
 example.breedItem = 'wheat';
@@ -31,9 +34,7 @@ example.setHealth(20);
 example.maxHealth = 20;
 
 //wip
-var sounds = example.createSoundObject('random');
-sounds.addSound('1', 'soundfile');
-example.setMainSound(sounds); //whis will be changed later
+example.setSound('step', 'base64stringsound');
 
 example.registerOEntity();
 

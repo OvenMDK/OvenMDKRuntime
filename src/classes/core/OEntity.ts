@@ -6,11 +6,13 @@ export default class OEntity {
   private entityName: string;
   private entityID: string;
   public entityModel: string;
+  public entitySize: number = 0.5; //default size
   private entity_sound_main: string;
   public maxHealth: number = 0;
   public entityBreedItem: string;
   public breedable: boolean = false;
   public entityDropItem: string;
+  public useSpawnEgg: boolean = false;
   private eggBase: any;
   private eggSpots: any;
   private extra_tasks: any[];
@@ -86,55 +88,6 @@ export default class OEntity {
     var entityBreedItem2: string = this.entityBreedItem;
     var entityDropItem2: string = this.entityDropItem;
     // START CUSTOM ENTITY
-    let entitySize1: number; // Default size for most entities
-    let entitySize2: number;
-
-    if (this.entityModel === "ModelChicken") {
-      entitySize1 = 0.4; // Chicken
-      entitySize2 = 0.7;
-    } else if (this.entityModel === "ModelCow") {
-      entitySize1 = 0.9; // Cow
-      entitySize2 = 1.4;
-    } else if (this.entityModel === "ModelMooshroom") {
-      entitySize1 = 0.9; // Mooshroom
-      entitySize2 = 1.4;
-    } else if (this.entityModel === "ModelPig") {
-      entitySize1 = 0.9; // Pig
-      entitySize2 = 0.9;
-    } else if (this.entityModel === "ModelSheep") {
-      entitySize1 = 0.9; // Sheep
-      entitySize2 = 1.3;
-    } else if (this.entityModel === "ModelHorse") {
-      entitySize1 = 1.3965; // Horse
-      entitySize2 = 1.6; // Height can vary slightly
-    } else if (this.entityModel === "ModelRabbit") {
-      entitySize1 = 0.4; // Rabbit
-      entitySize2 = 0.5;
-    } else if (this.entityModel === "ModelSquid") {
-      entitySize1 = 0.8; // Squid
-      entitySize2 = 0.8;
-    } else if (this.entityModel === "ModelBat") {
-      entitySize1 = 0.5; // Bat
-      entitySize2 = 0.9;
-    } else if (this.entityModel === "ModelOcelot") {
-      entitySize1 = 0.6; // Ocelot (wild)
-      entitySize2 = 0.7;
-    } else if (this.entityModel === "ModelWolf") {
-      entitySize1 = 0.6; // Wolf
-      entitySize2 = 0.85;
-    } else if (this.entityModel === "ModelVillager") {
-      entitySize1 = 0.6; // Villager
-      entitySize2 = 1.95;
-    } else if (this.entityModel === "ModelIronGolem") {
-      entitySize1 = 1.4; // Iron Golem
-      entitySize2 = 2.9;
-    } else if (
-      this.entityModel === "ModelSnowman" ||
-      this.entityModel === "ModelSnowGolem"
-    ) {
-      entitySize1 = 0.7; // Snow Golem
-      entitySize2 = 1.9;
-    }
 
     var entityClass = ModAPI.reflect.getClassById(
       "net.minecraft.entity.passive.EntityAnimal"
@@ -145,7 +98,7 @@ export default class OEntity {
     );
     if (globalThis.Debug_mode) {
       console.warn(
-        `this is entity size 1: ${entitySize1}, this is entity size 2: ${entitySize2}, oh the breeditem ${entityBreedItem2}, and dropItem ${entityDropItem2}`
+        `the breeditem ${entityBreedItem2}, and dropItem ${entityDropItem2}`
       );
     };
     var entityBreedItem2: string = this.entityBreedItem;
@@ -156,7 +109,7 @@ export default class OEntity {
       entitySuper(this, $worldIn);
       this.wrapped ||= ModAPI.util.wrap(this).getCorrective();
 
-      this.wrapped.setSize(entitySize1 || 0.4, entitySize2 || 0.7);
+      this.wrapped.setSize(0.4, this.entitySize);
       this.wrapped.tasks.addTask(0, AITask("EntityAISwimming", 1)(this));
       this.wrapped.tasks.addTask(1, AITask("EntityAIPanic", 2)(this, 1.9));
       this.wrapped.tasks.addTask(2, AITask("EntityAIMate", 2)(this, 1.0));
@@ -250,7 +203,8 @@ export default class OEntity {
         1
       );
     };
-    nme_OEntity.prototype.$getDropItem = function () {
+
+    if (this.entityDropItem) nme_OEntity.prototype.$getDropItem = function () {
       return ModAPI.items[this.entityDropItem].getRef();
     };
     nme_OEntity.prototype.$createChild = function (otherParent) {
@@ -258,7 +212,7 @@ export default class OEntity {
       return new nme_OEntity(this.wrapped.worldObj?.getRef() ?? null);
     };
 
-    nme_OEntity.prototype.$isBreedingItem = function (itemstack) {
+    if (this.breedable) nme_OEntity.prototype.$isBreedingItem = function (itemstack) {
       return (
         itemstack !== null &&
         itemstack.$getItem() === ModAPI.items[entityBreedItem2].getRef()
@@ -268,7 +222,7 @@ export default class OEntity {
 
     // START CUSTOM MODEL
     var modelChickenClass = ModAPI.reflect.getClassById(
-      `net.minecraft.client.model.${this.entityModel}`
+      `net.minecraft.client.model.ModelChicken`
     );
     var modelChickenSuper = ModAPI.reflect.getSuper(modelChickenClass); //while super isn't used when extending this class, java implies the call.
     var nmcm_OEntityModel = function nmcm_OEntityModel() {
